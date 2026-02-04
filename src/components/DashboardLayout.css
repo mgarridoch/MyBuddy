@@ -1,0 +1,28 @@
+.dashboard-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+  max-width: 1400px; /* Que no se estire infinito en pantallas gigantes */
+  width: 100%;
+  margin: 0 auto;
+  
+  /* AQUÍ ESTÁ LA MAGIA DEL GRID */
+  display: grid;
+  gap: 1.5rem;
+  /* Por defecto (Móvil): 1 sola columna */
+  grid-template-columns: 1fr; 
+}
+
+/* Versión Escritorio (Tablets grandes y PC) */
+@media (min-width: 900px) {
+  .main-content {
+    /* 70% Calendario (izquierda) - 30% Panel (derecha) */
+    grid-template-columns: 2fr 1fr; 
+    padding: 2rem;
+  }
+}

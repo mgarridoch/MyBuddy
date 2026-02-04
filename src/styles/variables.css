@@ -1,0 +1,31 @@
+:root {
+  /* --- PALETA DE COLORES (Según tu documento) --- */
+  
+  /* Violeta Principal (Botones, Checks activos, Títulos) */
+  --color-primary: #9381ff;
+  
+  /* Violeta Claro (Bordes, Elementos secundarios) */
+  --color-secondary: #b8b8ff;
+  
+  /* Blanco Hueso (Fondo general de la app) */
+  --color-bg: #f8f7ff;
+  
+  /* Crema (Tarjetas destacadas o fondos de notas) */
+  --color-accent-cream: #ffeedd;
+  
+  /* Beige (Detalles sutiles) */
+  --color-accent-beige: #ffd8be;
+
+  /* Neutros */
+  --color-white: #ffffff;
+  --color-text-main: #2c2c2c;   /* Negro suave para lectura */
+  --color-text-muted: #666666;  /* Gris para fechas o textos secundarios */
+  --color-danger: #ff6b6b;      /* Para el botón de eliminar rutinas */
+
+  /* --- BORDES Y SOMBRAS --- */
+  --radius-sm: 8px;
+  --radius-md: 12px; /* El estándar para tus tarjetas */
+  --radius-lg: 20px;
+  
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}

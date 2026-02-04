@@ -1,0 +1,113 @@
+/* Cabecera del mes (Enero 2024, Flechas) */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+}
+
+.month-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: capitalize; /* Para que "febrero" sea "Febrero" */
+}
+
+.nav-arrow {
+  padding: 0.5rem;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+
+.nav-arrow:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+/* La Grilla Principal */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columnas iguales */
+  gap: 8px; /* Espacio entre cuadraditos */
+}
+
+/* Nombres de los días (Lun, Mar...) */
+.weekday-label {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* La Celda del Día */
+.day-cell {
+  background-color: var(--color-white);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  min-height: 80px; /* Altura suficiente para ver contenido */
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  position: relative;
+}
+
+.day-cell:hover {
+  border-color: var(--color-secondary);
+  transform: translateY(-2px);
+}
+
+/* Día seleccionado (Click) */
+.day-cell.selected {
+  border-color: var(--color-primary);
+  background-color: #fcfbff;
+}
+
+/* Días de otro mes (grisáceos) */
+.day-cell.inactive {
+  background-color: transparent;
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+/* El número del día */
+.day-number {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* El día de "HOY" */
+.day-cell.today .day-number {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* BARRA DE PROGRESO (Visual) */
+.progress-bar-container {
+  height: 6px;
+  width: 100%;
+  background-color: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: auto; /* Empujar hacia abajo */
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  /* El ancho y color se pondrán dinámicamente en linea */
+}

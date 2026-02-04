@@ -1,9 +1,33 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Dashboard } from './pages/Dashboard';
+import { HabitsPage } from './pages/HabitsPage';
+import { LoginPage } from './pages/LoginPage';
+
 function App() {
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>MyBuddy</h1>
-      <p>Inicializando sistema...</p>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Ruta pública */}
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* Rutas Protegidas */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/habits" element={
+            <ProtectedRoute>
+              <HabitsPage />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

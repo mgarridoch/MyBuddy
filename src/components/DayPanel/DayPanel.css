@@ -1,0 +1,115 @@
+
+.panel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.panel-header {
+  border-bottom: 2px solid var(--color-bg);
+  padding-bottom: 1rem;
+}
+
+.panel-date-title {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  margin-bottom: 0.8rem;
+}
+
+/* LISTAS DE ITEMS (Rutinas/Tareas) */
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.item-row:hover {
+  background-color: var(--color-bg);
+}
+
+/* CHECKBOX PERSONALIZADO */
+.custom-checkbox {
+  appearance: none; /* Borra el estilo por defecto del navegador */
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: all 0.2s;
+}
+
+/* Cuando está marcado */
+.custom-checkbox:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* El "ticket" o "check" dentro (usamos un pseudo-elemento CSS) */
+.custom-checkbox::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  transform: scale(0); /* Oculto por defecto */
+  transition: 0.2s transform ease-in-out;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); /* Forma de Check */
+}
+
+.custom-checkbox:checked::before {
+  transform: scale(1); /* Visible */
+}
+
+.item-text {
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+}
+
+.item-text.completed {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+/* NOTAS TEXTAREA */
+.notes-area {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem;
+  font-family: inherit;
+  resize: vertical;
+  background-color: #fafafa;
+}
+.notes-area:focus {
+  outline: 2px solid var(--color-primary);
+  background-color: white;
+}
+
+.empty-msg {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
