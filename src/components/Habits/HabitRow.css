@@ -1,3 +1,4 @@
+/* src/components/Habits/HabitRow.css */
 .habit-card {
   background-color: var(--color-white);
   border: 1px solid var(--color-secondary);
@@ -16,22 +17,34 @@
 
 .habit-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  /* FIX: Esto permite que el texto ocupe espacio pero se rinda si no hay */
+  flex: 1; 
+  min-width: 0; 
+  margin-right: 10px;
 }
 
 .habit-name {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text-main);
+  
+  /* FIX: Cortar texto con (...) si es muy largo */
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
 }
 
-/* CONTENEDOR DE DÍAS (L M M J V S D) */
+/* CONTENEDOR DE DÍAS */
 .days-grid {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-start;
-  flex-wrap: wrap; /* Para que baje en moviles muy chicos */
+  /* FIX: Evitar que los días se aplasten si el nombre es largo */
+  flex-shrink: 0; 
+  flex-wrap: wrap; 
 }
 
 .day-toggle {
@@ -50,7 +63,6 @@
   transition: all 0.2s;
 }
 
-/* Estado Activo (Día Seleccionado) */
 .day-toggle.active {
   background-color: var(--color-primary);
   color: white;
@@ -61,13 +73,15 @@
   background-color: var(--color-bg);
 }
 
-/* BOTONES DE ACCIÓN (Editar/Eliminar) */
+/* BOTONES DE ACCIÓN */
 .actions-container {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
   border-top: 1px solid #eee;
   padding-top: 0.8rem;
+  /* FIX: Evitar que los botones se aplasten */
+  flex-shrink: 0; 
 }
 
 .btn-action {
@@ -75,6 +89,8 @@
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   border: 1px solid transparent;
+  cursor: pointer;
+  background-color: transparent;
 }
 
 .btn-edit {
@@ -89,14 +105,14 @@
 }
 .btn-delete:hover { background-color: #fff0f0; }
 
-/* Responsive: En pantallas grandes, poner todo en una linea */
-@media (min-width: 768px) {
+/* Responsive: Escritorio */
+@media (min-width: 900px) {
   .habit-card {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
   }
-  .habit-header { margin-bottom: 0; flex: 1; }
+  .habit-header { margin-bottom: 0; }
   .days-grid { margin: 0 1rem; }
   .actions-container { border-top: none; padding-top: 0; }
 }

@@ -84,3 +84,23 @@ export const getRangeLogs = async (startDate: Date, endDate: Date) => {
   if (error) throw error;
   return data as { habit_id: number; date: string }[];
 };
+
+// ... imports y funciones anteriores
+
+// 6. ACTUALIZAR FRECUENCIA (Días)
+export const updateHabitFrequency = async (id: number, frequency: number[]) => {
+  const { error } = await supabase
+    .from('habits')
+    .update({ frequency })
+    .eq('id', id);
+  if (error) throw error;
+};
+
+// 7. ACTUALIZAR NOMBRE (Renombrar)
+export const updateHabitName = async (id: number, name: string) => {
+  const { error } = await supabase
+    .from('habits')
+    .update({ name })
+    .eq('id', id);
+  if (error) throw error;
+};

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Save, X } from 'lucide-react';
 import { HabitRow } from '../components/Habits/HabitRow';
-import { getMyHabits, createHabit, deleteHabit } from '../services/habitService';
+// Importamos las nuevas funciones del servicio
+import { getMyHabits, createHabit, deleteHabit, updateHabitFrequency, updateHabitName } from '../services/habitService';
 import type { Habit } from '../types';
 
 export const HabitsPage: React.FC = () => {
@@ -12,9 +13,8 @@ export const HabitsPage: React.FC = () => {
   // Estado para el formulario de creación
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newFrequency, setNewFrequency] = useState<number[]>([1, 2, 3, 4, 5]); // L-V por defecto
+  const [newFrequency, setNewFrequency] = useState<number[]>([1, 2, 3, 4, 5]); 
 
-  // Cargar rutinas al iniciar
   useEffect(() => {
     loadHabits();
   }, []);
@@ -30,51 +30,96 @@ export const HabitsPage: React.FC = () => {
     }
   };
 
+  // --- LOGICA DE CREACIÓN ---
   const handleSaveNew = async () => {
     if (!newName.trim()) return;
     try {
       await createHabit(newName, newFrequency);
       setNewName('');
       setIsCreating(false);
-      loadHabits(); // Recargar lista
+      loadHabits(); 
     } catch (error) {
       alert('Error guardando rutina');
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm('¿Estás seguro de eliminar esta rutina? Perderás el historial asociado.')) {
-      await deleteHabit(id);
-      loadHabits();
+  // --- LOGICA DE EDICIÓN (Interactive Row) ---
+  
+  // 1. Cambiar días (Click en los botones L M M...)
+  const handleToggleDay = async (habitId: number, dayId: number) => {
+    // Buscamos el hábito en el estado actual
+    const habitToUpdate = habits.find(h => h.id === habitId);
+    if (!habitToUpdate) return;
+
+    // Calculamos la nueva frecuencia
+    let newFreq = [];
+    if (habitToUpdate.frequency.includes(dayId)) {
+      newFreq = habitToUpdate.frequency.filter(d => d !== dayId); // Quitar
+    } else {
+      newFreq = [...habitToUpdate.frequency, dayId].sort(); // Agregar
+    }
+
+    // Actualización OPTIMISTA (Actualizamos la UI antes de la BD para que se sienta rápido)
+    const updatedHabits = habits.map(h => h.id === habitId ? { ...h, frequency: newFreq } : h);
+    setHabits(updatedHabits);
+
+    // Guardar en BD
+    try {
+      await updateHabitFrequency(habitId, newFreq);
+    } catch (error) {
+      console.error("Error actualizando frecuencia", error);
+      loadHabits(); // Revertir si falla
     }
   };
 
-  // Renderizado del selector de días (reutilizado para el formulario)
-  const renderDaySelector = () => {
-    const days = [
-      { l: 'L', id: 1 }, { l: 'M', id: 2 }, { l: 'M', id: 3 }, { l: 'J', id: 4 }, 
-      { l: 'V', id: 5 }, { l: 'S', id: 6 }, { l: 'D', id: 7 }
-    ];
-    return (
-      <div className="days-grid" style={{marginTop: '10px'}}>
-        {days.map(d => (
-          <button 
-            key={d.id}
-            onClick={() => {
-              if (newFrequency.includes(d.id)) {
-                setNewFrequency(newFrequency.filter(id => id !== d.id));
-              } else {
-                setNewFrequency([...newFrequency, d.id]);
-              }
-            }}
-            className={`day-toggle ${newFrequency.includes(d.id) ? 'active' : ''}`}
-          >
-            {d.l}
-          </button>
-        ))}
-      </div>
-    );
+  // 2. Renombrar (Click en Editar)
+  const handleRename = async (habitId: number) => {
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit) return;
+
+    // Usamos un prompt nativo simple para editar el nombre
+    const newNameInput = prompt("Nuevo nombre para la rutina:", habit.name);
+    
+    if (newNameInput && newNameInput.trim() !== "" && newNameInput !== habit.name) {
+      // Actualizar UI
+      const updatedHabits = habits.map(h => h.id === habitId ? { ...h, name: newNameInput } : h);
+      setHabits(updatedHabits);
+
+      // Guardar en BD
+      try {
+        await updateHabitName(habitId, newNameInput);
+      } catch (error) {
+        console.error("Error renombrando", error);
+        loadHabits();
+      }
+    }
   };
+
+  // 3. Eliminar (Click en Eliminar)
+  const handleDelete = async (habitId: number) => {
+    if (confirm('¿Estás seguro de eliminar esta rutina? Perderás el historial asociado.')) {
+      try {
+        // UI Optimista
+        setHabits(habits.filter(h => h.id !== habitId));
+        // BD call
+        await deleteHabit(habitId);
+      } catch (error) {
+        loadHabits();
+      }
+    }
+  };
+
+  // --- RENDER ---
+  
+  // Helper para el formulario de NUEVA rutina
+  const toggleNewFrequencyDay = (dayId: number) => {
+    if (newFrequency.includes(dayId)) {
+      setNewFrequency(newFrequency.filter(id => id !== dayId));
+    } else {
+      setNewFrequency([...newFrequency, dayId]);
+    }
+  };
+  const daysRef = [{l:'L',id:1},{l:'M',id:2},{l:'M',id:3},{l:'J',id:4},{l:'V',id:5},{l:'S',id:6},{l:'D',id:7}];
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-secondary)', padding: '2rem' }}>
@@ -91,16 +136,14 @@ export const HabitsPage: React.FC = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {loading ? <p>Cargando...</p> : habits.map(habit => (
-            // Nota: HabitRow es solo visual por ahora, le pasamos datos reales
-            <div key={habit.id} style={{position: 'relative'}}>
-                <HabitRow name={habit.name} frequency={habit.frequency} />
-                {/* Botón eliminar "hacky" superpuesto para probar funcionalidad rapida */}
-                <button 
-                    onClick={() => handleDelete(habit.id)}
-                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', opacity: 0}}
-                    className='delete-overlay'
-                >X</button>
-            </div>
+            // AQUI USAMOS EL COMPONENTE INTERACTIVO
+            <HabitRow 
+              key={habit.id} 
+              habit={habit}
+              onToggleDay={handleToggleDay}
+              onRename={handleRename}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
 
@@ -112,18 +155,22 @@ export const HabitsPage: React.FC = () => {
           }}>
             <h3 style={{color: 'var(--color-primary)', marginBottom: '10px'}}>Nueva Rutina</h3>
             <input 
-              autoFocus
-              type="text" 
-              placeholder="Ej: Meditar 5 minutos" 
-              value={newName}
-              onChange={e => setNewName(e.target.value)}
-              style={{
-                width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', 
-                border: '1px solid #ccc', fontSize: '1rem'
-              }}
+              autoFocus type="text" placeholder="Ej: Meditar 5 minutos" 
+              value={newName} onChange={e => setNewName(e.target.value)}
+              style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid #ccc', fontSize: '1rem' }}
             />
             <p style={{marginTop: '10px', fontSize: '0.9rem', color: '#666'}}>Días activos:</p>
-            {renderDaySelector()}
+            
+            <div className="days-grid" style={{marginTop: '10px'}}>
+              {daysRef.map(d => (
+                <button 
+                  key={d.id} onClick={() => toggleNewFrequencyDay(d.id)}
+                  className={`day-toggle ${newFrequency.includes(d.id) ? 'active' : ''}`}
+                >
+                  {d.l}
+                </button>
+              ))}
+            </div>
             
             <div style={{display: 'flex', gap: '10px', marginTop: '15px', justifyContent: 'flex-end'}}>
               <button onClick={() => setIsCreating(false)} style={{display:'flex', alignItems:'center', gap: '5px', color: '#666'}}>

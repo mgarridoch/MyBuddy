@@ -1,9 +1,17 @@
+/* src/components/DayPanel/DayPanel.css */
 
 .panel-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   height: 100%;
+}
+
+/* Ajuste móvil: Dar espacio abajo para que no choque con el borde del navegador */
+@media (max-width: 900px) {
+  .panel-container {
+    padding-bottom: 80px; 
+  }
 }
 
 .panel-header {
@@ -39,7 +47,9 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  padding: 0.5rem;
+  /* MODIFICADO: Más padding para facilitar el toque en móvil */
+  padding: 0.8rem 0.5rem; 
+  margin-bottom: 4px; 
   border-radius: var(--radius-sm);
   transition: background 0.2s;
 }
@@ -51,14 +61,17 @@
 /* CHECKBOX PERSONALIZADO */
 .custom-checkbox {
   appearance: none; /* Borra el estilo por defecto del navegador */
-  width: 22px;
-  height: 22px;
+  /* MODIFICADO: Tamaño aumentado a 26px para mejor tacto */
+  width: 26px;
+  height: 26px;
   border: 2px solid var(--color-secondary);
-  border-radius: 6px;
+  /* MODIFICADO: Borde un poco más redondeado */
+  border-radius: 8px; 
   cursor: pointer;
   display: grid;
   place-content: center;
   transition: all 0.2s;
+  background-color: transparent; /* Asegura fondo transparente si no está marcado */
 }
 
 /* Cuando está marcado */
@@ -67,24 +80,26 @@
   border-color: var(--color-primary);
 }
 
-/* El "ticket" o "check" dentro (usamos un pseudo-elemento CSS) */
+/* El "ticket" o "check" dentro */
 .custom-checkbox::before {
   content: "";
-  width: 12px;
-  height: 12px;
+  /* MODIFICADO: Ticket interno ligeramente más grande */
+  width: 14px; 
+  height: 14px;
   background-color: white;
-  transform: scale(0); /* Oculto por defecto */
+  transform: scale(0); 
   transition: 0.2s transform ease-in-out;
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); /* Forma de Check */
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
 
 .custom-checkbox:checked::before {
-  transform: scale(1); /* Visible */
+  transform: scale(1); 
 }
 
 .item-text {
   color: var(--color-text-main);
   font-size: 0.95rem;
+  line-height: 1.4; /* Mejora lectura si el texto es largo */
 }
 
 .item-text.completed {
@@ -100,6 +115,7 @@
   border-radius: var(--radius-sm);
   padding: 0.8rem;
   font-family: inherit;
+  font-size: 1rem; /* Letra un poco más grande para escribir cómodo */
   resize: vertical;
   background-color: #fafafa;
 }
@@ -112,4 +128,5 @@
   font-size: 0.85rem;
   color: var(--color-text-muted);
   font-style: italic;
+  padding: 0.5rem;
 }
