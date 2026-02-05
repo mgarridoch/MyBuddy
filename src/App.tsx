@@ -6,6 +6,7 @@ import { HabitsPage } from './pages/HabitsPage';
 import { LoginPage } from './pages/LoginPage';
 import { MobileDayPage } from './pages/MobileDayPage';
 import { DataProvider } from './context/DataContext';
+import { PrivacyPage } from './pages/PrivacyPage';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
                 <HabitsPage />
               </ProtectedRoute>
             } />
+            <Route path="/privacy" element={<PrivacyPage />} />
           </Routes>
         </BrowserRouter>
       </DataProvider>

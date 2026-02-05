@@ -100,6 +100,9 @@ export const LoginPage: React.FC = () => {
           </svg>
           Iniciar sesión con Google
         </button>
+        <a style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }} href="/privacy">
+        Información de privacidad
+      </a>
       </div>
     </div>
   );
