@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
   eachDayOfInterval, isSameMonth, isSameDay, addMonths, 
-  subMonths, isToday, getDay, startOfDay, isBefore, parseISO 
+  subMonths, isToday, getDay, startOfDay, isBefore 
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -27,7 +27,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDate
   // DATOS REALES
   const [habits, setHabits] = useState<Habit[]>([]);
   const [monthLogs, setMonthLogs] = useState<{ habit_id: number; date: string }[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // Definir rango visual del calendario
   const monthStart = startOfMonth(currentMonthView);

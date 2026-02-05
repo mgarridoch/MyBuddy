@@ -2,12 +2,12 @@ import { startOfDay, endOfDay } from 'date-fns';
 import { supabase } from './supabase';
 import type { CalendarConfig } from '../types';
 
-interface GoogleEvent {
-  id: string;
-  summary: string; // El título del evento
-  start: { dateTime?: string; date?: string }; // Google devuelve dateTime (hora) o date (evento de todo el dia)
-  end: { dateTime?: string; date?: string };
-}
+// interface GoogleEvent {
+//  id: string;
+//  summary: string; // El título del evento
+//  start: { dateTime?: string; date?: string }; // Google devuelve dateTime (hora) o date (evento de todo el dia)
+//  end: { dateTime?: string; date?: string };
+//}
 
 export interface CalendarEventSimple {
   id: string;
