@@ -14,6 +14,8 @@ export default defineConfig({
         short_name: 'MyBuddy',
         description: 'Tu organizador de vida personal',
         theme_color: '#f8f7ff',
+        scope: '/',
+        start_url: '/day',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -23,7 +25,8 @@ export default defineConfig({
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       }
