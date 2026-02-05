@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import type { Task } from '../types';
 import { format } from 'date-fns';
+import type { DayNote } from '../types';
 
 // --- TAREAS (TASKS) ---
 
@@ -77,4 +78,35 @@ export const saveDayNote = async (date: Date, content: string) => {
     );
 
   if (error) throw error;
+};
+
+// OBTENER TAREAS POR RANGO
+export const getTasksRange = async (start: Date, end: Date) => {
+  const startStr = format(start, 'yyyy-MM-dd');
+  const endStr = format(end, 'yyyy-MM-dd');
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .gte('date', startStr)
+    .lte('date', endStr)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return data as Task[];
+};
+
+// OBTENER NOTAS POR RANGO
+export const getNotesRange = async (start: Date, end: Date) => {
+  const startStr = format(start, 'yyyy-MM-dd');
+  const endStr = format(end, 'yyyy-MM-dd');
+
+  const { data, error } = await supabase
+    .from('day_notes')
+    .select('*')
+    .gte('date', startStr)
+    .lte('date', endStr);
+
+  if (error) throw error;
+  return data as DayNote[]; // Asegúrate de tener la interfaz DayNote exportada en types
 };

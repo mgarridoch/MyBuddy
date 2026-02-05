@@ -21,11 +21,13 @@ export interface CalendarEventSimple {
 export interface GoogleEventDisplay {
   id: string;
   title: string;
+  date: string;
   time: string;
   isAllDay: boolean;
-  color: string;     // <--- Nuevo: Color del calendario
-  calendarName: string; // <--- Nuevo: Para saber de dónde viene
-  startRaw: Date;    // <--- Nuevo: Para ordenar cronológicamente
+  color: string;
+  calendarName: string;
+  calendarId: string; // <--- Crucial para borrar
+  startRaw: Date;
 }
 
 // A. OBTENER LISTA DE CALENDARIOS DE GOOGLE
@@ -278,4 +280,66 @@ export const deleteGoogleEvent = async (
   );
 
   if (!response.ok) throw new Error('Error eliminando evento');
+};
+
+export const getGoogleEventsForMonth = async (providerToken: string, start: Date, end: Date) => {
+  const timeMin = start.toISOString();
+  const timeMax = end.toISOString();
+
+  // 1. Obtener calendarios visibles
+  const { data: settings } = await supabase
+    .from('calendar_settings')
+    .select('*')
+    .eq('is_visible', true);
+
+  const calendarsToFetch = (settings && settings.length > 0) 
+    ? settings 
+    : [{ google_id: 'primary', color: '#9381ff', name: 'Principal' }];
+
+  // 2. Fetch en paralelo
+  const fetchPromises = calendarsToFetch.map(async (cal) => {
+    const calendarIdEncoded = encodeURIComponent(cal.google_id);
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/${calendarIdEncoded}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`,
+        {
+          headers: { Authorization: `Bearer ${providerToken}` }
+        }
+      );
+      
+      // Si un calendario da 404 o error, retornamos vacío para ese calendario pero NO rompemos la app
+      if (!response.ok) {
+        console.warn(`Calendario no encontrado o sin acceso: ${cal.name}`);
+        return [];
+      }
+      
+      const data = await response.json();
+
+      return (data.items || []).map((event: any) => {
+        const isAllDay = !!event.start.date;
+        const startDt = new Date(event.start.dateTime || event.start.date);
+        
+        return {
+          id: event.id,
+          title: event.summary || '(Sin título)',
+          date: (event.start.dateTime || event.start.date).split('T')[0],
+          time: isAllDay ? 'Todo el día' : startDt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isAllDay,
+          color: cal.color,
+          calendarName: cal.name,
+          calendarId: cal.google_id, // <--- Guardamos el ID real para poder borrar luego
+          startRaw: startDt
+        };
+      });
+
+    } catch (e) { 
+      return []; 
+    }
+  });
+
+  const results = await Promise.all(fetchPromises);
+  const allEvents = results.flat();
+  
+  // Ordenar por hora
+  return allEvents.sort((a, b) => a.startRaw.getTime() - b.startRaw.getTime());
 };
