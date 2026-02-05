@@ -21,7 +21,7 @@ export const LoginPage: React.FC = () => {
         options: {
           redirectTo: window.location.origin,
           // AGREGAMOS ESTO: Pedimos acceso de solo lectura al calendario
-          scopes: 'https://www.googleapis.com/auth/calendar.readonly',
+          scopes: 'https://www.googleapis.com/auth/calendar',
           queryParams: {
             // Esto fuerza a Google a enviar un "provider_token" nuevo
             access_type: 'offline',

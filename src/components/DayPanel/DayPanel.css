@@ -3,7 +3,7 @@
 .panel-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.8rem;
   height: 100%;
 }
 
@@ -30,17 +30,17 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--color-secondary);
-  margin-bottom: 0.8rem;
+  color: var(--color-primary);
+  margin-bottom: 0.4rem;
 }
 
 /* LISTAS DE ITEMS (Rutinas/Tareas) */
 .item-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 2px;
 }
 
 .item-row {
@@ -48,10 +48,11 @@
   align-items: center;
   gap: 0.8rem;
   /* MODIFICADO: Más padding para facilitar el toque en móvil */
-  padding: 0.8rem 0.5rem; 
-  margin-bottom: 4px; 
+  padding: 0.3rem 0.5rem;
+  margin-bottom: 0;
   border-radius: var(--radius-sm);
   transition: background 0.2s;
+  min-height: 36px;
 }
 
 .item-row:hover {
@@ -62,11 +63,11 @@
 .custom-checkbox {
   appearance: none; /* Borra el estilo por defecto del navegador */
   /* MODIFICADO: Tamaño aumentado a 26px para mejor tacto */
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border: 2px solid var(--color-secondary);
   /* MODIFICADO: Borde un poco más redondeado */
-  border-radius: 8px; 
+  border-radius: 6px;
   cursor: pointer;
   display: grid;
   place-content: center;
@@ -84,8 +85,8 @@
 .custom-checkbox::before {
   content: "";
   /* MODIFICADO: Ticket interno ligeramente más grande */
-  width: 14px; 
-  height: 14px;
+  width: 10px;
+  height: 10px;
   background-color: white;
   transform: scale(0); 
   transition: 0.2s transform ease-in-out;
@@ -129,4 +130,8 @@
   color: var(--color-text-muted);
   font-style: italic;
   padding: 0.5rem;
+}
+
+.item-row div[style*="borderLeft"] {
+  padding-left: 8px !important;
 }

@@ -4,6 +4,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './pages/Dashboard';
 import { HabitsPage } from './pages/HabitsPage';
 import { LoginPage } from './pages/LoginPage';
+import { MobileDayPage } from './pages/MobileDayPage';
 
 function App() {
   return (
@@ -17,6 +18,12 @@ function App() {
           <Route path="/" element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/day" element={
+            <ProtectedRoute>
+              <MobileDayPage />
             </ProtectedRoute>
           } />
           

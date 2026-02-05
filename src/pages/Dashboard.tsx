@@ -5,11 +5,22 @@ import { DayPanel } from '../components/DayPanel/DayPanel';
 import { CalendarSettingsModal } from '../components/Calendar/CalendarSettingsModal';
 
 export const Dashboard: React.FC = () => {
+  // const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isCalendarSettingsOpen, setIsCalendarSettingsOpen] = useState(false);
   // ESTADO SEÑAL
   // Usamos un contador. Cada vez que aumenta, React detecta un cambio.
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // const navigate = useNavigate();
+  // E IMPORTAR USEFFECT
+  // REDIRECCIÓN MÓVIL AUTOMÁTICA
+  // useEffect(() => {
+  // Si la pantalla es menor a 768px (típico tablet/móvil)
+  //  if (window.innerWidth < 768) {
+  //    navigate('/day');
+  //  }
+  //}, []); // Se ejecuta solo al montar
 
   const handleDataChange = () => {
     // Aumentamos el contador para forzar la recarga del calendario

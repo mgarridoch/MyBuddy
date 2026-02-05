@@ -144,7 +144,8 @@ export const getGoogleEvents = async (providerToken: string, date: Date) => {
           isAllDay,
           color: cal.color, // Usamos el color guardado en Supabase
           calendarName: cal.name,
-          startRaw: startDt
+          startRaw: startDt,
+          calendarId: cal.google_id // <-- Nuevo: Para saber a qué calendario pertenece (útil para editar/eliminar)
         };
       });
 
@@ -219,4 +220,62 @@ export const getGoogleEventsRange = async (providerToken: string, start: Date, e
 
   const results = await Promise.all(fetchPromises);
   return results.flat(); 
+};
+
+// D. CREAR EVENTO
+export const createGoogleEvent = async (
+  providerToken: string, 
+  calendarId: string, 
+  eventData: { title: string; start: Date; end: Date; isAllDay: boolean }
+) => {
+  const calIdEncoded = encodeURIComponent(calendarId);
+  
+  // Preparar el cuerpo según lo que pide Google
+  const resource = {
+    summary: eventData.title,
+    start: eventData.isAllDay 
+      ? { date: eventData.start.toISOString().split('T')[0] } // Solo fecha YYYY-MM-DD
+      : { dateTime: eventData.start.toISOString() },          // Fecha y hora ISO
+    end: eventData.isAllDay 
+      ? { date: eventData.end.toISOString().split('T')[0] }
+      : { dateTime: eventData.end.toISOString() }
+  };
+
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${calIdEncoded}/events`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${providerToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(resource)
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error?.message || 'Error creando evento');
+  }
+};
+
+// E. ELIMINAR EVENTO
+export const deleteGoogleEvent = async (
+  providerToken: string, 
+  calendarId: string, 
+  eventId: string
+) => {
+  const calIdEncoded = encodeURIComponent(calendarId);
+  
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${calIdEncoded}/events/${eventId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${providerToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error('Error eliminando evento');
 };
