@@ -7,22 +7,21 @@
 .main-content {
   flex: 1;
   padding: 1rem;
-  max-width: 1400px; /* Que no se estire infinito en pantallas gigantes */
+  /* CAMBIO 1: Aumentar el ancho máximo para aprovechar pantallas grandes */
+  max-width: 1800px; 
   width: 100%;
   margin: 0 auto;
   
-  /* AQUÍ ESTÁ LA MAGIA DEL GRID */
   display: grid;
   gap: 1.5rem;
-  /* Por defecto (Móvil): 1 sola columna */
   grid-template-columns: 1fr; 
 }
 
-/* Versión Escritorio (Tablets grandes y PC) */
 @media (min-width: 900px) {
   .main-content {
-    /* 70% Calendario (izquierda) - 30% Panel (derecha) */
-    grid-template-columns: 2fr 1fr; 
+    /* CAMBIO 2: Darle más espacio al calendario (3 partes vs 1 parte del panel) */
+    /* Antes era 2fr 1fr */
+    grid-template-columns: 3fr 1fr; 
     padding: 2rem;
   }
 }

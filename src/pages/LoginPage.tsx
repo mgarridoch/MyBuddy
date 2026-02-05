@@ -19,7 +19,14 @@ export const LoginPage: React.FC = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: window.location.origin // Esto redirige a localhost:5173
+          redirectTo: window.location.origin,
+          // AGREGAMOS ESTO: Pedimos acceso de solo lectura al calendario
+          scopes: 'https://www.googleapis.com/auth/calendar.readonly',
+          queryParams: {
+            // Esto fuerza a Google a enviar un "provider_token" nuevo
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         }
       });
       if (error) throw error;

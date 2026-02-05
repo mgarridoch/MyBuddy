@@ -29,8 +29,10 @@
 /* La Grilla Principal */
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7 columnas iguales */
-  gap: 8px; /* Espacio entre cuadraditos */
+  /* ANTES: grid-template-columns: repeat(7, 1fr); */
+  /* AHORA: Esto fuerza a las columnas a no crecer por el contenido */
+  grid-template-columns: repeat(7, minmax(0, 1fr)); 
+  gap: 8px;
 }
 
 /* Nombres de los días (Lun, Mar...) */
@@ -110,4 +112,75 @@
   height: 100%;
   border-radius: 4px;
   /* El ancho y color se pondrán dinámicamente en linea */
+}
+
+/* Contenedor de la lista de eventos dentro del día */
+.events-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+  width: 100%;
+  flex: 1; /* Ocupar espacio disponible */
+  overflow: hidden; /* Ocultar si hay demasiados */
+}
+
+/* La barrita individual del evento */
+.event-bar {
+  font-size: 0.75rem; /* Un pelín más grande para leer mejor */
+  padding: 2px 6px;   /* Un poco más de "aire" interno */
+  border-radius: 4px;
+  
+  /* CAMBIO 4: Texto seguro (Trucamiento) */
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis; /* Pone los "..." */
+  max-width: 100%; /* Obligatorio para que funcione el ellipsis */
+  
+  cursor: pointer;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  font-weight: 600; /* Letra un poco más gordita */
+  line-height: 1.3;
+  
+  /* CAMBIO 5: Borde para contraste contra fondo blanco */
+  border: 1px solid rgba(0, 0, 0, 0.15); 
+  /* Sombra suave para darle profundidad */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Ajuste sutil para eventos con hora vs todo el día */
+/* .event-bar.is-time { */
+  /* Opcional: Si quieres que los que tienen hora se vean distintos */
+  /* border-left: 2px solid rgba(255,255,255,0.8); */
+/*} */
+
+/* Aseguramos que la celda crezca un poco o mantenga orden */
+/* La Celda del Día */
+.day-cell {
+  background-color: var(--color-white);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  
+  /* CAMBIO 3: Aumentar altura para que quepan más eventos cómodamente */
+  min-height: 120px; /* Antes era 80px */
+  
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Alinear todo arriba */
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  position: relative;
+  gap: 4px; /* Espacio entre el numero y los eventos */
+}
+
+/* Ajuste del número del día para que no estorbe */
+.day-number {
+  align-self: flex-end; /* Mover número a la derecha o dejarlo centrado según gusto */
+  font-size: 0.8rem;
+  width: 20px;
+  height: 20px;
+  margin-bottom: 2px;
 }

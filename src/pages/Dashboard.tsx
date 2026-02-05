@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { CalendarGrid } from '../components/Calendar/CalendarGrid';
 import { DayPanel } from '../components/DayPanel/DayPanel';
+import { CalendarSettingsModal } from '../components/Calendar/CalendarSettingsModal';
 
 export const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  
+  const [isCalendarSettingsOpen, setIsCalendarSettingsOpen] = useState(false);
   // ESTADO SEÑAL
   // Usamos un contador. Cada vez que aumenta, React detecta un cambio.
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -16,7 +17,7 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <DashboardLayout>
+    <DashboardLayout onOpenSettings={() => setIsCalendarSettingsOpen(true)}>
       {/* IZQUIERDA: Escucha la señal */}
       <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '20px', boxShadow: 'var(--shadow-card)' }}>
         <CalendarGrid 
@@ -33,6 +34,11 @@ export const Dashboard: React.FC = () => {
           onDataChange={handleDataChange} // <--- LE DAMOS EL CALLBACK
         />
       </div>
+      <CalendarSettingsModal 
+         isOpen={isCalendarSettingsOpen}
+         onClose={() => setIsCalendarSettingsOpen(false)}
+         onUpdate={() => setRefreshTrigger(prev => prev + 1)} // Reusamos el trigger para recargar
+       />
     </DashboardLayout>
   );
 };

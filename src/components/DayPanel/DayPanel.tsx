@@ -4,6 +4,8 @@ import { es } from 'date-fns/locale';
 import { Calendar as CalendarIcon, CheckSquare, ListTodo, PenLine, Settings, X, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
+import { useAuth } from '../../context/AuthContext'; 
+import { getGoogleEvents } from '../../services/googleService'; 
 import './DayPanel.css';
 
 // Servicios y Tipos
@@ -15,7 +17,6 @@ interface DayPanelProps {
   selectedDate: Date;
   onDataChange: () => void; // Nueva prop para indicar cambios de datos
 }
-
 export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange }) => {
   const navigate = useNavigate();
   const isFuture = isAfter(startOfDay(selectedDate), startOfDay(new Date()));
@@ -35,10 +36,16 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange }
   const [noteContent, setNoteContent] = useState('');
   const [isSavingNote, setIsSavingNote] = useState(false);
 
+  const { session } = useAuth();
+  // Nuevo estado para eventos de Google
+  const [googleEvents, setGoogleEvents] = useState<any[]>([]);
+  const [googleError, setGoogleError] = useState(false);
+
   // --- CARGA DE DATOS ---
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setGoogleError(false);
       try {
         // 1. Cargar Hábitos (Tu lógica anterior)
         const allHabits = await getMyHabits();
@@ -64,6 +71,19 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange }
         // 3. Cargar Nota
         setNoteContent(await getDayNote(selectedDate));
 
+        // --- CARGA DE GOOGLE CALENDAR ---
+        // El token está en session.provider_token
+        if (session?.provider_token) {
+          try {
+            const gEvents = await getGoogleEvents(session.provider_token, selectedDate);
+            setGoogleEvents(gEvents);
+          } catch (err) {
+            console.error("Error Google Calendar:", err);
+            setGoogleError(true);
+          }
+        }
+
+
       } catch (error) {
         console.error("Error cargando datos:", error);
       } finally {
@@ -72,7 +92,7 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange }
     };
 
     fetchData();
-  }, [selectedDate]);
+  }, [selectedDate, session]);
 
 
   // --- HANDLERS HÁBITOS ---
@@ -143,10 +163,51 @@ const handleToggleHabit = async (habitId: number, isChecked: boolean) => {
         </h2>
       </div>
 
-      {/* EVENTOS */}
+    {/* EVENTOS GOOGLE CALENDAR */}
       <section>
         <div className="section-title"><CalendarIcon size={18} /> Eventos</div>
-        <div className="item-list"><div className="empty-msg">- No hay eventos -</div></div>
+        <div className="item-list">
+          
+          {/* Caso 1: No logueado con Google o Token expirado */}
+          {googleError && (
+             <div className="empty-msg" style={{color: '#ff6b6b'}}>
+               ⚠️ No se pudo conectar con Google Calendar. Intenta reconectar (Logout/Login).
+             </div>
+          )}
+
+          {/* Caso 2: Cargando o Sin Eventos */}
+          {!googleError && googleEvents.length === 0 ? (
+            <div className="empty-msg">- No hay eventos en Google Calendar -</div>
+          ) : (
+            googleEvents.map(ev => (
+              <div key={ev.id} className="item-row" style={{ cursor: 'default', background: 'transparent', alignItems: 'stretch' }}>
+                
+                {/* Visual Mejorado: Borde de Color Dinámico */}
+                <div style={{
+                  display:'flex', 
+                  flexDirection:'column', 
+                  // AQUÍ USAMOS EL COLOR DEL CALENDARIO (ev.color)
+                  borderLeft: `4px solid ${ev.color || 'var(--color-primary)'}`, 
+                  paddingLeft: '12px',
+                  justifyContent: 'center'
+                }}>
+                  <div style={{display:'flex', gap:'8px', alignItems:'baseline'}}>
+                    <span style={{ fontSize: '0.85rem', color: ev.color, fontWeight: 700, minWidth:'60px' }}>
+                      {ev.time}
+                    </span>
+                    {/* Badge pequeño con nombre del calendario (opcional, si quieres ver de dónde viene) */}
+                    {/* <span style={{fontSize:'0.6rem', background:'#eee', padding:'2px 4px', borderRadius:'4px'}}>{ev.calendarName}</span> */}
+                  </div>
+                  
+                  <span className="item-text" style={{fontWeight: 500}}>
+                    {ev.title}
+                  </span>
+                </div>
+
+              </div>
+            ))
+          )}
+        </div>
       </section>
 
       {/* RUTINAS */}

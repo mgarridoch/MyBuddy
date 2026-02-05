@@ -29,3 +29,10 @@ export interface DayNote {
   date: string;
   content: string;
 }
+
+export interface CalendarConfig {
+  google_id: string;
+  name: string;
+  color: string;
+  is_visible: boolean;
+}
