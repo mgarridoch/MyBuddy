@@ -5,6 +5,7 @@ import { getMyHabits, getRangeLogs } from '../services/habitService';
 import { getTasksRange, getNotesRange } from '../services/dailyService';
 import { getGoogleEventsForMonth } from '../services/googleService';
 import type { Habit, Task, DayNote } from '../types';
+import { supabase } from '../services/supabase'; // Asegúrate de importar esto
 
 interface DataContextType {
   // Datos crudos del mes
@@ -73,8 +74,28 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setNotes(fetchedNotes);
       setGoogleEvents(fetchedGoogle || []);
 
-    } catch (error) {
-      console.error("Error cargando datos del mes:", error);
+    } catch (error: any) {
+      console.error("Error cargando datos:", error);
+
+      // --- AQUÍ ESTÁ LA MAGIA AUTOMÁTICA ---
+      // Si el error es específicamente de token vencido
+      if (error.message === "TOKEN_EXPIRED" || error.message?.includes("401")) {
+        console.log("Token vencido. Refrescando sesión automáticamente...");
+        
+        // Disparamos el login inmediatamente
+        await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin,
+            scopes: 'https://www.googleapis.com/auth/calendar',
+            queryParams: {
+              access_type: 'offline',
+              // Importante NO poner prompt: 'consent' para que sea silencioso
+            },
+          }
+        });
+        return; // Detenemos la ejecución para que se recargue la página
+      }
     } finally {
       setLoading(false);
     }

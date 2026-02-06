@@ -25,7 +25,6 @@ export const LoginPage: React.FC = () => {
           queryParams: {
             // Esto fuerza a Google a enviar un "provider_token" nuevo
             access_type: 'offline',
-            prompt: 'consent',
           },
         }
       });

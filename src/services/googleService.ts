@@ -193,6 +193,11 @@ export const getGoogleEventsRange = async (providerToken: string, start: Date, e
         }
       );
       
+      // CAMBIO IMPORTANTE: Detectar 401
+      if (response.status === 401) {
+        throw new Error("TOKEN_EXPIRED");
+      }
+
       if (!response.ok) return [];
       const data = await response.json();
 
@@ -306,7 +311,10 @@ export const getGoogleEventsForMonth = async (providerToken: string, start: Date
           headers: { Authorization: `Bearer ${providerToken}` }
         }
       );
-      
+      // CAMBIO IMPORTANTE: Detectar 401
+      if (response.status === 401) {
+        throw new Error("TOKEN_EXPIRED");
+      }
       // Si un calendario da 404 o error, retornamos vacío para ese calendario pero NO rompemos la app
       if (!response.ok) {
         console.warn(`Calendario no encontrado o sin acceso: ${cal.name}`);

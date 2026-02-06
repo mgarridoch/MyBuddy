@@ -82,11 +82,21 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
     onDataChange(); // Actualiza el calendario
   };
 
-  const handleCreateTask = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && newTaskTitle.trim()) {
-      await createTask(newTaskTitle, selectedDate);
-      setNewTaskTitle('');
+// 1. Función genérica para guardar (sin depender del evento)
+  const submitNewTask = async () => {
+    if (newTaskTitle.trim()) {
+      const titleToSave = newTaskTitle; // Guardamos ref local
+      setNewTaskTitle(''); // Limpiamos UI rápido
+      await createTask(titleToSave, selectedDate);
       refreshData();
+    }
+  };
+
+  // 2. Handler para el teclado (Enter)
+  const handleTaskKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Evita que salte al siguiente input
+      submitNewTask();
     }
   };
 
@@ -201,10 +211,25 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
             </div>
           ))}
           <div className="item-row" style={{background: 'transparent', paddingLeft: 0}}>
-             <Plus size={18} color="var(--color-secondary)"/>
+             {/* CAMBIO: Ahora el icono es un botón funcional */}
+             <button 
+               onClick={submitNewTask}
+               style={{
+                 background: 'none', border: 'none', padding: '5px', 
+                 cursor: 'pointer', display: 'flex', alignItems: 'center'
+               }}
+             >
+               <Plus size={18} color="var(--color-primary)"/>
+             </button>
+             
              <input 
-               type="text" placeholder="Agregar nueva tarea..." value={newTaskTitle}
-               onChange={(e) => setNewTaskTitle(e.target.value)} onKeyDown={handleCreateTask}
+               type="text" 
+               placeholder="Agregar nueva tarea..." 
+               value={newTaskTitle}
+               onChange={(e) => setNewTaskTitle(e.target.value)}
+               onKeyDown={handleTaskKeyDown}
+               // CAMBIO: Esto le dice al celular que muestre "Done" o "Hecho"
+               enterKeyHint="done" 
                style={{border: 'none', background:'transparent', width:'100%', outline:'none', fontSize:'0.95rem'}}
              />
           </div>
