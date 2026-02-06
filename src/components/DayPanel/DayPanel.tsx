@@ -33,6 +33,7 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const [showCompletedTasks, setShowCompletedTasks] = useState(false);
 
   const isFuture = isAfter(startOfDay(selectedDate), startOfDay(new Date()));
   const dateStr = format(selectedDate, 'yyyy-MM-dd');
@@ -62,6 +63,11 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
 
   // 2. Filtrar Tareas del día
   const todaysTasks = tasks.filter(t => t.date === dateStr);
+
+  const totalTasksCount = todaysTasks.length;
+  const doneTasksCount = todaysTasks.filter(t => t.completed).length;
+  const pendingTasks = todaysTasks.filter(t => !t.completed);
+  const completedTasks = todaysTasks.filter(t => t.completed);
 
   // 3. Obtener Nota del día
   const todaysNoteContent = notes.find(n => n.date === dateStr)?.content || '';
@@ -199,43 +205,63 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
 
       {/* SECCIÓN TAREAS */}
       <section>
-        <div className="section-title"><ListTodo size={18} /> Tareas de Hoy</div>
+        <div className="section-title">
+          <ListTodo size={18} /> 
+          Tareas de Hoy {totalTasksCount > 0 && `(${doneTasksCount}/${totalTasksCount})`}
+        </div>
+
         <div className="item-list">
-          {todaysTasks.map(task => (
+          {/* A. MOSTRAR PRIMERO LAS PENDIENTES */}
+          {pendingTasks.map(task => (
             <div key={task.id} className="item-row" style={{justifyContent: 'space-between'}}>
               <label style={{display:'flex', gap:'10px', alignItems:'center', flex: 1, cursor:'pointer'}}>
                 <input type="checkbox" className="custom-checkbox" checked={task.completed} onChange={(e) => handleToggleTask(task.id, e.target.checked)} />
-                <span className={`item-text ${task.completed ? 'completed' : ''}`}>{task.title}</span>
+                <span className="item-text">{task.title}</span>
               </label>
-              <button onClick={() => handleDeleteTask(task.id)} style={{color: 'var(--color-text-muted)'}}><X size={14}/></button>
+              <button onClick={() => handleDeleteTask(task.id)} style={{color: 'var(--color-text-muted)', cursor:'pointer'}}><X size={14}/></button>
             </div>
           ))}
-          <div className="item-row" style={{background: 'transparent', paddingLeft: 0}}>
-             {/* CAMBIO: Ahora el icono es un botón funcional */}
-             <button 
-               onClick={submitNewTask}
-               style={{
-                 background: 'none', border: 'none', padding: '5px', 
-                 cursor: 'pointer', display: 'flex', alignItems: 'center'
-               }}
-             >
+
+          {/* B. BOTÓN PARA MOSTRAR/OCULTAR COMPLETADAS */}
+          {completedTasks.length > 0 && (
+            <button 
+              onClick={() => setShowCompletedTasks(!showCompletedTasks)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: 'none', border: 'none', padding: '8px 5px',
+                color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 600,
+                cursor: 'pointer', opacity: 0.8
+              }}
+            >
+              {showCompletedTasks ? 'v Ocultar' : '> Mostrar'} tareas completadas ({completedTasks.length})
+            </button>
+          )}
+
+          {/* C. LISTA DE COMPLETADAS (Condicional) */}
+          {showCompletedTasks && completedTasks.map(task => (
+            <div key={task.id} className="item-row" style={{justifyContent: 'space-between', opacity: 0.6}}>
+              <label style={{display:'flex', gap:'10px', alignItems:'center', flex: 1, cursor:'pointer'}}>
+                <input type="checkbox" className="custom-checkbox" checked={task.completed} onChange={(e) => handleToggleTask(task.id, e.target.checked)} />
+                <span className="item-text completed">{task.title}</span>
+              </label>
+              <button onClick={() => handleDeleteTask(task.id)} style={{color: 'var(--color-text-muted)', cursor:'pointer'}}><X size={14}/></button>
+            </div>
+          ))}
+          
+          {/* INPUT PARA NUEVA TAREA (Siempre al final) */}
+          <div className="item-row" style={{background: 'transparent', paddingLeft: 0, marginTop: '5px'}}>
+             <button onClick={submitNewTask} style={{ background: 'none', border: 'none', padding: '5px', cursor: 'pointer' }}>
                <Plus size={18} color="var(--color-primary)"/>
              </button>
-             
              <input 
-               type="text" 
-               placeholder="Agregar nueva tarea..." 
-               value={newTaskTitle}
-               onChange={(e) => setNewTaskTitle(e.target.value)}
-               onKeyDown={handleTaskKeyDown}
-               // CAMBIO: Esto le dice al celular que muestre "Done" o "Hecho"
-               enterKeyHint="done" 
-               style={{border: 'none', background:'transparent', width:'100%', outline:'none', fontSize:'0.95rem'}}
+               type="text" placeholder="Agregar nueva tarea..." value={newTaskTitle}
+               onChange={(e) => setNewTaskTitle(e.target.value)} onKeyDown={handleTaskKeyDown}
+               enterKeyHint="done"
+               style={{border: 'none', background:'transparent', width:'100%', outline:'none', fontSize:'0.95rem', color: 'var(--color-text-main)'}}
              />
           </div>
         </div>
       </section>
-
       {/* SECCIÓN NOTAS */}
       <section>
         <div className="section-title" style={{justifyContent:'space-between'}}>
