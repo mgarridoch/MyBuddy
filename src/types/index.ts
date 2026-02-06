@@ -36,3 +36,9 @@ export interface CalendarConfig {
   color: string;
   is_visible: boolean;
 }
+
+export interface AppSettings {
+  show_stats: boolean;
+  show_calendar: boolean;
+  show_sports: boolean;
+}

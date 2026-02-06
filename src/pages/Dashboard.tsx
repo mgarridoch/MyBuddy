@@ -2,54 +2,50 @@ import React, { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { CalendarGrid } from '../components/Calendar/CalendarGrid';
 import { DayPanel } from '../components/DayPanel/DayPanel';
-import { CalendarSettingsModal } from '../components/Calendar/CalendarSettingsModal';
+
+// CAMBIO 1: Importamos el nuevo Modal de Ajustes Generales
+// (Asegúrate de que la ruta coincida donde creaste el archivo)
+import { SettingsModal } from '../components/Settings/SettingsModal';
 
 export const Dashboard: React.FC = () => {
-  // const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [isCalendarSettingsOpen, setIsCalendarSettingsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // Le cambié el nombre para que tenga más sentido
+  
   // ESTADO SEÑAL
-  // Usamos un contador. Cada vez que aumenta, React detecta un cambio.
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // const navigate = useNavigate();
-  // E IMPORTAR USEFFECT
-  // REDIRECCIÓN MÓVIL AUTOMÁTICA
-  // useEffect(() => {
-  // Si la pantalla es menor a 768px (típico tablet/móvil)
-  //  if (window.innerWidth < 768) {
-  //    navigate('/day');
-  //  }
-  //}, []); // Se ejecuta solo al montar
-
   const handleDataChange = () => {
-    // Aumentamos el contador para forzar la recarga del calendario
+    // Esto sigue siendo útil para cuando DayPanel cambia cosas locales
     setRefreshTrigger(prev => prev + 1);
   };
 
   return (
-    <DashboardLayout onOpenSettings={() => setIsCalendarSettingsOpen(true)}>
-      {/* IZQUIERDA: Escucha la señal */}
+    <DashboardLayout onOpenSettings={() => setIsSettingsOpen(true)}>
+      
+      {/* IZQUIERDA: Calendario */}
       <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '20px', boxShadow: 'var(--shadow-card)' }}>
         <CalendarGrid 
           selectedDate={selectedDate} 
           onDateSelect={setSelectedDate} 
-          refreshTrigger={refreshTrigger} // <--- SE LA PASAMOS
+          refreshTrigger={refreshTrigger} 
         />
       </div>
 
-      {/* DERECHA: Emite la señal */}
+      {/* DERECHA: Panel del Día */}
       <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-secondary)', padding: '20px', overflowY: 'auto' }}>
         <DayPanel 
           selectedDate={selectedDate} 
-          onDataChange={handleDataChange} // <--- LE DAMOS EL CALLBACK
+          onDataChange={handleDataChange} 
         />
       </div>
-      <CalendarSettingsModal 
-         isOpen={isCalendarSettingsOpen}
-         onClose={() => setIsCalendarSettingsOpen(false)}
-         onUpdate={() => setRefreshTrigger(prev => prev + 1)} // Reusamos el trigger para recargar
+
+      {/* CAMBIO 2: El Nuevo Modal Global */}
+      <SettingsModal 
+         isOpen={isSettingsOpen}
+         onClose={() => setIsSettingsOpen(false)}
+         // Ya no necesitamos onUpdate={...} porque el modal actualiza el Contexto internamente
        />
+
     </DashboardLayout>
   );
 };

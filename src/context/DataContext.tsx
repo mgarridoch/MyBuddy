@@ -4,7 +4,8 @@ import { useAuth } from './AuthContext';
 import { getMyHabits, getRangeLogs } from '../services/habitService';
 import { getTasksRange, getNotesRange } from '../services/dailyService';
 import { getGoogleEventsForMonth } from '../services/googleService';
-import type { Habit, Task, DayNote } from '../types';
+import { getAppSettings, saveAppSettings } from '../services/settingsService';
+import type { Habit, Task, DayNote, AppSettings } from '../types';
 import { supabase } from '../services/supabase'; // Asegúrate de importar esto
 
 interface DataContextType {
@@ -14,7 +15,8 @@ interface DataContextType {
   tasks: Task[];
   notes: DayNote[];
   googleEvents: any[];
-  
+  appSettings: AppSettings;
+  updateAppSettings: (newSettings: AppSettings) => Promise<void>;
   loading: boolean;
   refreshData: () => Promise<void>; // Para forzar recarga manual
   
@@ -36,7 +38,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [tasks, setTasks] = useState<Task[]>([]);
   const [notes, setNotes] = useState<DayNote[]>([]);
   const [googleEvents, setGoogleEvents] = useState<any[]>([]);
-
+  const [appSettings, setAppSettingsState] = useState<AppSettings>({
+    show_stats: true, show_calendar: true, show_sports: true
+  });  
   // Función Maestra de Carga
   const loadMonthData = async () => {
     if (!session) return;
@@ -52,13 +56,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fetchedLogs,
         fetchedTasks,
         fetchedNotes,
-        fetchedGoogle
+        fetchedGoogle,
+        fetchedSettings
       ] = await Promise.all([
         getMyHabits(),
         getRangeLogs(start, end),
         getTasksRange(start, end),
         getNotesRange(start, end),
-        session.provider_token ? getGoogleEventsForMonth(session.provider_token, start, end) : []
+        session.provider_token ? getGoogleEventsForMonth(session.provider_token, start, end) : [],
+        getAppSettings()
       ]);
 
       // NOTA SOBRE GOOGLE: getGoogleEvents original calculaba startOfDay/endOfDay internamente sobre la fecha dada.
@@ -73,6 +79,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setTasks(fetchedTasks);
       setNotes(fetchedNotes);
       setGoogleEvents(fetchedGoogle || []);
+      setAppSettingsState(fetchedSettings || { show_stats: true, show_calendar: true, show_sports: true });
 
     } catch (error: any) {
       console.error("Error cargando datos:", error);
@@ -106,12 +113,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadMonthData();
   }, [currentMonthView, session]); // Dependencia clave: Mes
 
+  const updateAppSettings = async (newSettings: AppSettings) => {
+    setAppSettingsState(newSettings); // Optimistic UI
+    await saveAppSettings(newSettings); // Guardar en BD
+  };
   return (
     <DataContext.Provider value={{
       habits, habitLogs, tasks, notes, googleEvents,
       loading,
       refreshData: loadMonthData,
-      currentMonthView, setCurrentMonthView
+      currentMonthView, setCurrentMonthView,
+      appSettings,
+      updateAppSettings
     }}>
       {children}
     </DataContext.Provider>
