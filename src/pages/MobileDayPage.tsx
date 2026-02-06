@@ -54,7 +54,7 @@ export const MobileDayPage: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '10px 15px',
-        backgroundColor: 'white',
+        backgroundColor: 'var(--color-white)',
         borderBottom: '1px solid #eee',
         position: 'sticky',
         top: 0,

@@ -56,7 +56,7 @@
 }
 
 .item-row:hover {
-  background-color: var(--color-bg);
+  background-color: var(--color-input-bg);
 }
 
 /* CHECKBOX PERSONALIZADO */
@@ -98,7 +98,7 @@
 }
 
 .item-text {
-  color: var(--color-text-main);
+  color: var(--color-text-main); /* Asegurar que se lea en oscuro */
   font-size: 0.95rem;
   line-height: 1.4; /* Mejora lectura si el texto es largo */
 }
@@ -112,17 +112,23 @@
 .notes-area {
   width: 100%;
   min-height: 120px;
-  border: 1px solid var(--color-secondary);
+  border: 1px solid var(--color-border); 
   border-radius: var(--radius-sm);
   padding: 0.8rem;
   font-family: inherit;
   font-size: 1rem; /* Letra un poco más grande para escribir cómodo */
   resize: vertical;
-  background-color: #fafafa;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-main);  
 }
+.notes-area::placeholder {
+  color: var(--color-text-muted);
+}
+
 .notes-area:focus {
   outline: 2px solid var(--color-primary);
-  background-color: white;
+  /* En focus, mantenemos el fondo oscuro */
+  background-color: var(--color-input-bg); 
 }
 
 .empty-msg {

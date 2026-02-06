@@ -23,7 +23,7 @@ export const Dashboard: React.FC = () => {
     <DashboardLayout onOpenSettings={() => setIsSettingsOpen(true)}>
       
       {/* IZQUIERDA: Calendario */}
-      <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '20px', boxShadow: 'var(--shadow-card)' }}>
+      <div style={{ backgroundColor: 'var(--color-white)', borderRadius: 'var(--radius-lg)', padding: '20px', boxShadow: 'var(--shadow-card)' }}>
         <CalendarGrid 
           selectedDate={selectedDate} 
           onDateSelect={setSelectedDate} 
@@ -32,7 +32,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* DERECHA: Panel del Día */}
-      <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-secondary)', padding: '20px', overflowY: 'auto' }}>
+      <div style={{ backgroundColor: 'var(--color-white)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-secondary)', padding: '20px', overflowY: 'auto' }}>
         <DayPanel 
           selectedDate={selectedDate} 
           onDataChange={handleDataChange} 

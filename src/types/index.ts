@@ -41,4 +41,5 @@ export interface AppSettings {
   show_stats: boolean;
   show_calendar: boolean;
   show_sports: boolean;
+  theme: 'light' | 'dark'; // <--- Nuevo campo
 }

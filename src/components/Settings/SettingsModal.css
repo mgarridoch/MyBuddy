@@ -1,0 +1,114 @@
+/* EL CONTENEDOR FLOTANTE */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0,0,0,0.6); 
+  display: flex; align-items: center; justify-content: center; 
+  z-index: 2000;
+  backdrop-filter: blur(2px); /* Efecto vidrio bonito */
+}
+
+.modal-content {
+  background-color: var(--color-white); /* <--- CLAVE */
+  border-radius: var(--radius-lg);
+  width: 90%; max-width: 800px; height: 500px;
+  display: flex; overflow: hidden;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border); /* Borde sutil en dark mode */
+}
+
+/* SIDEBAR IZQUIERDO */
+.settings-sidebar {
+  width: 200px;
+  background-color: var(--color-bg); /* <--- Fondo oscuro en dark mode */
+  border-right: 1px solid var(--color-border);
+  padding: 1.5rem 1rem;
+  display: flex; flex-direction: column; gap: 5px;
+}
+
+.sidebar-title {
+  font-size: 1.1rem; margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  font-weight: 800; padding-left: 10px;
+}
+
+/* BOTONES DEL SIDEBAR */
+.sidebar-btn {
+  display: flex; align-items: center; gap: 10px; padding: 10px 15px;
+  border-radius: 8px; width: 100%; text-align: left; transition: all 0.2s;
+  background-color: transparent;
+  color: var(--color-text-muted); /* Color suave por defecto */
+  font-weight: 500;
+}
+
+.sidebar-btn:hover {
+  background-color: var(--color-input-bg);
+  color: var(--color-text-main);
+}
+
+.sidebar-btn.active {
+  background-color: rgba(147, 129, 255, 0.15); /* Transparencia violeta */
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* ÁREA DERECHA */
+.settings-main {
+  flex: 1; padding: 2rem;
+  display: flex; flex-direction: column; position: relative;
+  background-color: var(--color-white); /* Asegurar fondo correcto */
+}
+
+.close-btn {
+  position: absolute; top: 15px; right: 15px;
+  color: var(--color-text-muted);
+  padding: 5px;
+  border-radius: 50%;
+}
+.close-btn:hover { background-color: var(--color-bg); color: var(--color-text-main); }
+
+/* TITULOS INTERNOS */
+.settings-h2 {
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 10px;
+}
+
+.settings-subtitle {
+  font-weight: 700; margin-bottom: 10px;
+  color: var(--color-text-main); /* <--- Esto arregla el texto oscuro invisible */
+}
+
+.settings-desc {
+  font-size: 0.85rem; 
+  color: var(--color-text-muted); /* <--- Gris legible en ambos modos */
+  margin-bottom: 15px;
+}
+
+/* FILAS DE TOGGLE */
+.toggle-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  color: var(--color-text-main); /* Texto de labels */
+}
+
+/* TOGGLE SWITCH (Estilo CSS puro para no depender de inputs ocultos raros) */
+.switch {
+  position: relative; display: inline-block; width: 44px; height: 24px;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--color-border); /* Gris oscuro en dark mode */
+  transition: .4s; border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+  background-color: white; transition: .4s; border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+input:checked + .slider { background-color: var(--color-primary); }
+input:checked + .slider:before { transform: translateX(20px); }

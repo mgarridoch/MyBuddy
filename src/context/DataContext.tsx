@@ -39,7 +39,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [notes, setNotes] = useState<DayNote[]>([]);
   const [googleEvents, setGoogleEvents] = useState<any[]>([]);
   const [appSettings, setAppSettingsState] = useState<AppSettings>({
-    show_stats: true, show_calendar: true, show_sports: true
+    show_stats: true, show_calendar: true, show_sports: true, theme: 'light'
   });  
   // Función Maestra de Carga
   const loadMonthData = async () => {
@@ -79,7 +79,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setTasks(fetchedTasks);
       setNotes(fetchedNotes);
       setGoogleEvents(fetchedGoogle || []);
-      setAppSettingsState(fetchedSettings || { show_stats: true, show_calendar: true, show_sports: true });
+      setAppSettingsState(fetchedSettings || { show_stats: true, show_calendar: true, show_sports: true, theme: 'light' });
 
     } catch (error: any) {
       console.error("Error cargando datos:", error);
@@ -112,6 +112,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     loadMonthData();
   }, [currentMonthView, session]); // Dependencia clave: Mes
+
+  useEffect(() => {
+  if (appSettings.theme === 'dark') {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+}, [appSettings.theme]);
 
   const updateAppSettings = async (newSettings: AppSettings) => {
     setAppSettingsState(newSettings); // Optimistic UI

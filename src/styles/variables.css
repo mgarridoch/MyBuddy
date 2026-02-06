@@ -1,31 +1,49 @@
+/* src/styles/variables.css */
+
 :root {
-  /* --- PALETA DE COLORES (Según tu documento) --- */
-  
-  /* Violeta Principal (Botones, Checks activos, Títulos) */
+  /* --- COLORES BASE (Modo Claro) --- */
   --color-primary: #9381ff;
-  
-  /* Violeta Claro (Bordes, Elementos secundarios) */
   --color-secondary: #b8b8ff;
   
-  /* Blanco Hueso (Fondo general de la app) */
-  --color-bg: #f8f7ff;
+  --color-bg: #f8f7ff;         /* Fondo de la página */
+  --color-white: #ffffff;      /* Fondo de tarjetas */
   
-  /* Crema (Tarjetas destacadas o fondos de notas) */
-  --color-accent-cream: #ffeedd;
-  
-  /* Beige (Detalles sutiles) */
-  --color-accent-beige: #ffd8be;
+  --color-text-main: #2c2c2c;
+  --color-text-muted: #666666;
+  --color-danger: #ff6b6b;
 
-  /* Neutros */
-  --color-white: #ffffff;
-  --color-text-main: #2c2c2c;   /* Negro suave para lectura */
-  --color-text-muted: #666666;  /* Gris para fechas o textos secundarios */
-  --color-danger: #ff6b6b;      /* Para el botón de eliminar rutinas */
+  --color-border: #e0e0e0;     /* Borde suave para días y separadores */
+  --color-input-bg: #fafafa;   /* Fondo para el cuadro de notas e inputs */
+  --color-selected-bg: #f3f0ff; /* Fondo del día seleccionado (Claro) */
 
-  /* --- BORDES Y SOMBRAS --- */
+  /* --- MEDIDAS --- */
   --radius-sm: 8px;
-  --radius-md: 12px; /* El estándar para tus tarjetas */
+  --radius-md: 12px;
   --radius-lg: 20px;
-  
   --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* --- TEMA OSCURO --- */
+body.dark-mode {
+  /* Fondo principal (Muy oscuro) */
+  --color-bg: #0f0f1a; 
+  
+  /* Tarjetas (Un poco menos oscuro) */
+  --color-white: #1c1c2e; 
+  
+  /* Textos */
+  --color-text-main: #e6e6e6;
+  --color-text-muted: #a0a0b0;
+  
+  /* Bordes y Fondos de Input */
+  --color-border: #2d2d44;       /* Borde oscuro */
+  --color-input-bg: #232336;     /* Input oscuro */
+  --color-selected-bg: #2d2d44;  /* Día seleccionado oscuro (para que no brille) */
+  
+  /* Primarios ajustados para brillar */
+  --color-primary: #9381ff; 
+  --color-secondary: #5a5ab0;
+  
+  /* Sombras */
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
 }

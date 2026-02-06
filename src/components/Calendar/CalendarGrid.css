@@ -48,7 +48,7 @@
 /* La Celda del Día */
 .day-cell {
   background-color: var(--color-white);
-  border: 1px solid #e0e0e0; 
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   min-height: 80px; /* Altura suficiente para ver contenido */
   padding: 8px;
@@ -59,20 +59,23 @@
   transition: all 0.2s;
   box-shadow: 0 2px 3px rgba(0,0,0,0.05);
   position: relative;
-  
+  color: var(--color-text-main);
 }
 
+/* Hover */
 .day-cell:hover {
-  border-color: var(--color-primary);
-  /* Una sombra un poco más fuerte al pasar el mouse */
-  box-shadow: 0 4px 6px rgba(147, 129, 255, 0.15); 
-  z-index: 1; /* Que se ponga encima de las otras */
+  border-color: var(--color-secondary);
+  /* En dark mode, que no brille tanto el fondo al pasar mouse */
+  background-color: var(--color-selected-bg); 
+  z-index: 1;
 }
 
 /* Día seleccionado (Click) */
 .day-cell.selected {
   border-color: var(--color-primary);
-  background-color: #fcfbff;
+  background-color: var(--color-selected-bg); /* <--- CAMBIO: Variable dinámica */
+  /* Opcional: una sombra suave del color primario */
+  box-shadow: 0 0 0 1px var(--color-primary) inset;
 }
 
 /* Días de otro mes (grisáceos) */
@@ -96,10 +99,10 @@
 }
 
 
-/* El día de "HOY" */
+/* Día de HOY */
 .day-cell.today .day-number {
   background-color: var(--color-primary);
-  color: white;
+  color: white; /* El número siempre blanco porque el fondo es violeta */
 }
 
 /* BARRA DE PROGRESO (Visual) */

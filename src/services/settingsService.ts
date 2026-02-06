@@ -9,7 +9,7 @@ export const getAppSettings = async (): Promise<AppSettings> => {
 
   if (error || !data) {
     // Si no existe o error, devolvemos defaults (todo visible)
-    return { show_stats: true, show_calendar: true, show_sports: true };
+    return { show_stats: true, show_calendar: true, show_sports: true, theme: 'light' };
   }
   return data;
 };
