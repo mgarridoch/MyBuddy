@@ -1,0 +1,90 @@
+.routines-container {
+  padding: 1.5rem;
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  color: var(--color-text-main);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* TARJETA DE RUTINA */
+.routine-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.routine-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.routine-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+  color: var(--color-text-main);
+}
+
+.routine-meta {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  display: flex;
+  gap: 15px;
+}
+
+/* --- CONSTRUCTOR (Builder) --- */
+.builder-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+/* Lista de ejercicios dentro de la rutina */
+.routine-exercise-row {
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.row-inputs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.small-input {
+  width: 60px;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Selector de ejercicios (Modal o Panel) */
+.exercise-picker-item {
+  padding: 10px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+.exercise-picker-item:hover {
+  background-color: var(--color-input-bg);
+  color: var(--color-primary);
+}

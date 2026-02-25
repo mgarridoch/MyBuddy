@@ -7,37 +7,69 @@ import { LoginPage } from './pages/LoginPage';
 import { MobileDayPage } from './pages/MobileDayPage';
 import { DataProvider } from './context/DataContext';
 import { PrivacyPage } from './pages/PrivacyPage';
+import { ExercisesPage } from './pages/Sports/ExercisesPage';
+import { RoutinesPage } from './pages/Sports/RoutinesPage';
+import { SportsHub } from './pages/Sports/SportsHub';
+import { WorkoutSessionPage } from './pages/Sports/WorkoutSessionPage';
+import { WorkoutProvider } from './context/WorkoutContext';
 
 function App() {
   return (
     <AuthProvider>
       <DataProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Ruta pública */}
-            <Route path="/login" element={<LoginPage />} />
+        <WorkoutProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Ruta pública */}
+              <Route path="/login" element={<LoginPage />} />
 
-            {/* Rutas Protegidas */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
+              {/* Rutas Protegidas */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/day" element={
+              <Route path="/day" element={
+                <ProtectedRoute>
+                  <MobileDayPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/habits" element={
+                <ProtectedRoute>
+                  <HabitsPage />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/exercises" element={
               <ProtectedRoute>
-                <MobileDayPage />
+                <ExercisesPage />
               </ProtectedRoute>
-            } />
-            
-            <Route path="/habits" element={
+              } />
+
+              <Route path="/routines" element={
               <ProtectedRoute>
-                <HabitsPage />
+                <RoutinesPage />
               </ProtectedRoute>
-            } />
-            <Route path="/privacy" element={<PrivacyPage />} />
-          </Routes>
-        </BrowserRouter>
+              } />
+
+              <Route path="/sports" element={
+              <ProtectedRoute>
+                <SportsHub />
+              </ProtectedRoute>
+              } />
+
+              <Route path="/workout-session" element={
+              <ProtectedRoute>
+                <WorkoutSessionPage />
+              </ProtectedRoute>
+              } />
+
+              <Route path="/privacy" element={<PrivacyPage />} />
+            </Routes>
+          </BrowserRouter>
+        </WorkoutProvider>
       </DataProvider>
     </AuthProvider>
   )

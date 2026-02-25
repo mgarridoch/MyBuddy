@@ -1,0 +1,234 @@
+/* CONTAINER GENERAL */
+.workout-overview-container, .workout-focus-container {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  display: flex;
+  flex-direction: column;
+  
+  /* NUEVO: Limitar ancho y centrar */
+  max-width: 600px; /* Tamaño móvil/tablet cómodo para entrenar */
+  margin: 0 auto;
+  width: 100%;
+  border-left: 1px solid var(--color-border); /* Opcional: para darle marco en PC */
+  border-right: 1px solid var(--color-border);
+}
+
+/* --- VISTA LISTA --- */
+.workout-header-sticky {
+  position: sticky;
+  top: 0;
+  background-color: var(--color-bg);
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  z-index: 10;
+}
+
+.routine-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.timer-display {
+  font-family: monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex; align-items: center; gap: 5px;
+}
+
+.workout-list {
+  padding: 1rem;
+  flex: 1;
+  padding-bottom: 80px; /* Espacio para el footer */
+}
+
+.workout-item-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.workout-item-card.done {
+  opacity: 0.6;
+  background-color: rgba(147, 129, 255, 0.05);
+  border-color: var(--color-primary);
+}
+
+.quick-check {
+  color: var(--color-text-muted);
+}
+.quick-check.checked {
+  color: var(--color-primary);
+}
+
+.workout-footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background-color: var(--color-white);
+  padding: 1rem;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+}
+
+.finish-workout-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: flex; justify-content: center; align-items: center; gap: 10px;
+}
+
+/* --- VISTA DETALLE (FOCUS) --- */
+
+.workout-focus-container {
+  /* Asegurar que ocupe toda la pantalla disponible */
+  flex: 1; 
+  background-color: var(--color-bg);
+}
+
+.focus-header {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border); /* Separación sutil */
+  background-color: var(--color-white); /* Fondo sólido para el header */
+}
+
+.focus-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  flex: 1; /* Ocupar espacio central */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* LA FLECHA DE VOLVER */
+.back-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--color-text-main); /* <--- CLAVE: Usa variable de color de texto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.back-btn:hover {
+  background-color: var(--color-input-bg);
+}
+
+.timer-badge {
+  font-family: monospace;
+  font-weight: 600;
+  background-color: var(--color-input-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* VIDEO CONTAINER */
+.focus-video {
+  width: 100%;
+  aspect-ratio: 16/9; /* Proporción estándar de video */
+  max-height: 300px;
+  background-color: #000;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  position: relative;
+}
+
+.focus-video video { 
+  height: 100%; 
+  width: 100%; 
+  object-fit: contain; 
+}
+
+.no-video {
+  color: #666;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* FORMULARIO */
+.focus-form {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 columnas iguales */
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.input-group {
+  display: flex; 
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.input-group input {
+  font-size: 1.8rem;
+  text-align: center;
+  padding: 15px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border);
+  background-color: var(--color-white); /* Fondo de input */
+  color: var(--color-text-main);
+  width: 100%;
+  outline: none;
+  transition: border 0.2s;
+  font-weight: 700;
+}
+
+.input-group input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(147, 129, 255, 0.1);
+}
+
+/* BOTÓN COMPLETAR */
+.complete-btn {
+  margin: 1rem 1.5rem;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border-radius: var(--radius-lg);
+  border: none;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(147, 129, 255, 0.4);
+  transition: transform 0.1s;
+}
+
+.complete-btn:active {
+  transform: scale(0.98);
+}
+

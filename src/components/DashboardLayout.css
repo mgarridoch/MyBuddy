@@ -17,6 +17,13 @@
   grid-template-columns: 1fr; 
 }
 
+.layout-full-width {
+  display: block !important; /* Desactivar Grid */
+  max-width: 1200px; /* Ancho cómodo */
+  margin: 0 auto;
+  width: 100%;
+}
+
 @media (min-width: 900px) {
   .main-content {
     /* CAMBIO 2: Darle más espacio al calendario (3 partes vs 1 parte del panel) */
