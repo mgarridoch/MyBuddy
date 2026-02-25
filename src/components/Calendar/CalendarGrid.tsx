@@ -5,11 +5,12 @@ import {
   subMonths, isToday, getDay, startOfDay, isBefore 
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getGoogleEventsRange } from '../../services/googleService';
 import type { CalendarEventSimple } from '../../services/googleService';
 import './CalendarGrid.css';
+import { useData } from '../../context/DataContext';
 
 // Importamos servicios y tipos
 import { getMyHabits, getRangeLogs } from '../../services/habitService';
@@ -28,6 +29,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDate
   const [habits, setHabits] = useState<Habit[]>([]);
   const [monthLogs, setMonthLogs] = useState<{ habit_id: number; date: string }[]>([]);
   const [, setLoading] = useState(false);
+  const { notes } = useData(); 
 
   // Definir rango visual del calendario
   const monthStart = startOfMonth(currentMonthView);
@@ -134,7 +136,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDate
           // FILTRADO DE EVENTOS DEL DÍA
           const dayStr = format(day, 'yyyy-MM-dd');
           const daysEvents = calendarEvents.filter(e => e.date === dayStr);
-          
+          const hasNote = notes.some(n => n.date === dayStr && n.content.trim() !== '');
           // Ordenar: Primero "Todo el día", luego por hora
           daysEvents.sort((a, b) => {
             if (a.isAllDay && !b.isAllDay) return -1;
@@ -157,7 +159,15 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDate
               `}
               onClick={() => onDateSelect(day)}
             >
-              <span className="day-number">{format(day, 'd')}</span>
+              {/* HEADER DE LA CELDA (Nota izq, Número der) */}
+              <div style={{display:'flex', justifyContent:'space-between', width:'100%', marginBottom:'2px'}}>
+                {/* ICONO NOTA */}
+                <div style={{color: 'var(--color-primary)', opacity: hasNote ? 1 : 0}}>
+                  <FileText size={14} />
+                </div>
+                {/* NÚMERO DEL DÍA */}
+                <span className="day-number">{format(day, 'd')}</span>
+              </div>
 
               {/* LISTA DE EVENTOS VISUALES */}
               <div className="events-list-container">

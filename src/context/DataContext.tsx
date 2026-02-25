@@ -45,7 +45,27 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadMonthData = async () => {
     if (!session) return;
     setLoading(true);
-    
+
+    // --- EL GUARDIA DE SEGURIDAD DE GOOGLE ---
+    // Si la sesión de MyBuddy existe, pero el token de Google se borró por inactividad...
+    if (!session.provider_token) {
+      console.warn("Token de Google ausente por inactividad. Refrescando sesión...");
+      // Forzamos el flujo de OAuth de nuevo. Como ya diste permiso, 
+      // esto solo hará un parpadeo de pantalla y volverá con el token nuevo.
+      supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          scopes: 'https://www.googleapis.com/auth/calendar',
+          queryParams: {
+            access_type: 'offline' // Sin prompt consent para que sea automático
+          }
+        }
+      });
+      // Detenemos la ejecución porque la página se va a recargar en un segundo
+      return; 
+    }
+
     const start = startOfMonth(currentMonthView);
     const end = endOfMonth(currentMonthView);
 
