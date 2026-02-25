@@ -80,7 +80,7 @@ export const SportsHub: React.FC = () => {
             <span style={{fontSize:'0.8rem', color:'var(--color-text-muted)'}}>Ejercicios y videos</span>
           </Link>
 
-          <Link to="/stats" className="hub-card" style={{gridColumn: '1 / -1'}}>
+          <Link to="/sportstats" className="hub-card" style={{gridColumn: '1 / -1'}}>
             <div className="hub-icon-box"><BarChart2 size={24}/></div>
             <span style={{fontWeight:600}}>Mi Progreso</span>
             <span style={{fontSize:'0.8rem', color:'var(--color-text-muted)'}}>Peso corporal y fotos</span>

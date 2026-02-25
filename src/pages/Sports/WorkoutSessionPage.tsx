@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useWorkout } from '../../context/WorkoutContext';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Circle, Timer, Save } from 'lucide-react';
 import './WorkoutSession.css';
 

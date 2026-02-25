@@ -12,6 +12,7 @@ import { RoutinesPage } from './pages/Sports/RoutinesPage';
 import { SportsHub } from './pages/Sports/SportsHub';
 import { WorkoutSessionPage } from './pages/Sports/WorkoutSessionPage';
 import { WorkoutProvider } from './context/WorkoutContext';
+import { StatsPage } from './pages/Sports/StatsPage';
 
 function App() {
   return (
@@ -63,6 +64,12 @@ function App() {
               <Route path="/workout-session" element={
               <ProtectedRoute>
                 <WorkoutSessionPage />
+              </ProtectedRoute>
+              } />
+
+              <Route path="/sportstats" element={
+              <ProtectedRoute>
+                <StatsPage />
               </ProtectedRoute>
               } />
 
