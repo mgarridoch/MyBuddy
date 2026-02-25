@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Save, Search } from 'lucide-react';
-import type { Exercise, RoutineExercise } from '../../types';
-import { getExercises, createRoutine, addExerciseToRoutine,  } from '../../services/sportService';
+import type { Exercise, Routine, RoutineExercise } from '../../types';
+import { getExercises, createRoutine, addExerciseToRoutine, getRoutineDetails, updateRoutine, clearRoutineExercises } from '../../services/sportService';
 import '../../pages/Sports/RoutinesPage.css';
 
 interface Props {
   isOpen: boolean;
+  routineToEdit?: Routine | null; // <--- NUEVO
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const RoutineBuilderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
+export const RoutineBuilderModal: React.FC<Props> = ({ isOpen, routineToEdit, onClose, onSuccess }) => {
   // Estado Rutina
   const [routineName, setRoutineName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<Partial<RoutineExercise>[]>([]);
@@ -25,11 +26,23 @@ export const RoutineBuilderModal: React.FC<Props> = ({ isOpen, onClose, onSucces
   // Cargar biblioteca al abrir
   useEffect(() => {
     if (isOpen) {
-      setRoutineName('');
-      setSelectedExercises([]);
+      // 1. Cargar biblioteca siempre
       getExercises().then(setLibrary);
+
+      // 2. Si estamos EDITANDO, cargar datos
+      if (routineToEdit) {
+        setRoutineName(routineToEdit.name);
+        // Traer los ejercicios de esta rutina
+        getRoutineDetails(routineToEdit.id).then(details => {
+          setSelectedExercises(details);
+        });
+      } else {
+        // Si estamos CREANDO, limpiar
+        setRoutineName('');
+        setSelectedExercises([]);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, routineToEdit]);
 
   // Agregar ejercicio a la lista temporal
   const handleAddExercise = (ex: Exercise) => {
@@ -63,24 +76,32 @@ export const RoutineBuilderModal: React.FC<Props> = ({ isOpen, onClose, onSucces
   };
 
   // GUARDAR TODO
-  const handleSave = async () => {
+const handleSave = async () => {
     if (!routineName) return alert("Ponle nombre a la rutina");
     if (selectedExercises.length === 0) return alert("Agrega al menos un ejercicio");
 
     setLoading(true);
     try {
-      // 1. Crear Rutina Cabecera
-      const newRoutine = await createRoutine(routineName);
+      let currentRoutineId;
 
-      // 2. Crear Relaciones (Loop)
-      // Nota: Idealmente usaríamos una transacción o insert masivo, pero loop simple funciona para MVP
+      if (routineToEdit) {
+        // --- MODO EDICIÓN ---
+        // 1. Actualizar nombre
+        await updateRoutine(routineToEdit.id, routineName);
+        currentRoutineId = routineToEdit.id;
+        // 2. Borrar todos los ejercicios viejos para meter los nuevos (forma más segura de editar listas)
+        await clearRoutineExercises(currentRoutineId);
+      } else {
+        // --- MODO CREACIÓN ---
+        const newRoutine = await createRoutine(routineName);
+        currentRoutineId = newRoutine.id;
+      }
+
+      // --- GUARDAR EJERCICIOS (Para ambos modos) ---
       for (let i = 0; i < selectedExercises.length; i++) {
         const item = selectedExercises[i];
         if (item.exercise_id) {
-          await addExerciseToRoutine(newRoutine.id, item.exercise_id, i, item.sets, item.reps);
-          // Faltaría actualizar sets/reps custom, pero addExerciseToRoutine usa defaults.
-          // FIX RÁPIDO: Actualizar addExerciseToRoutine en sportService para aceptar sets/reps
-          // (Te dejaré la tarea de actualizar el servicio, o usaré defaults por ahora)
+          await addExerciseToRoutine(currentRoutineId, item.exercise_id, i, item.sets, item.reps);
         }
       }
 

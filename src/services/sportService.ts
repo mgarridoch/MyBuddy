@@ -188,3 +188,21 @@ export const getExerciseHistory = async (exerciseId: number) => {
     reps: log.reps
   }));
 };
+
+// ACTUALIZAR RUTINA
+export const updateRoutine = async (id: number, name: string) => {
+  const { error } = await supabase.from('routines').update({ name }).eq('id', id);
+  if (error) throw error;
+};
+
+// ELIMINAR RUTINA
+export const deleteRoutine = async (id: number) => {
+  const { error } = await supabase.from('routines').delete().eq('id', id);
+  if (error) throw error;
+};
+
+// LIMPIAR EJERCICIOS DE UNA RUTINA (Para cuando editamos y guardamos de nuevo)
+export const clearRoutineExercises = async (routineId: number) => {
+  const { error } = await supabase.from('routine_exercises').delete().eq('routine_id', routineId);
+  if (error) throw error;
+};
