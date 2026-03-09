@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { startOfMonth, endOfMonth } from 'date-fns';
+import { startOfMonth, endOfMonth, format, startOfWeek, endOfWeek } from 'date-fns';
 import { useAuth } from './AuthContext';
 import { getMyHabits, getRangeLogs } from '../services/habitService';
 import { getTasksRange, getNotesRange } from '../services/dailyService';
@@ -49,25 +49,31 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // --- EL GUARDIA DE SEGURIDAD DE GOOGLE ---
     // Si la sesión de MyBuddy existe, pero el token de Google se borró por inactividad...
     if (!session.provider_token) {
-      console.warn("Token de Google ausente por inactividad. Refrescando sesión...");
-      // Forzamos el flujo de OAuth de nuevo. Como ya diste permiso, 
-      // esto solo hará un parpadeo de pantalla y volverá con el token nuevo.
+      console.warn("Token de Google ausente por inactividad. Refrescando sesión silenciosamente...");
+      
       supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: window.location.origin,
           scopes: 'https://www.googleapis.com/auth/calendar',
           queryParams: {
-            access_type: 'offline' // Sin prompt consent para que sea automático
+            access_type: 'offline',
+            // LA MAGIA ESTÁ AQUÍ: Le decimos a Google exactamente quién eres
+            // para que no te muestre la pantalla de "Elige una cuenta"
+            login_hint: session.user.email || '' 
           }
         }
       });
-      // Detenemos la ejecución porque la página se va a recargar en un segundo
       return; 
     }
 
-    const start = startOfMonth(currentMonthView);
-    const end = endOfMonth(currentMonthView);
+    // 2. Cambiamos cómo calculamos start y end
+    const monthStart = startOfMonth(currentMonthView);
+    const monthEnd = endOfMonth(currentMonthView);
+
+    // Ampliamos el rango para que incluya la primera semana visible y la última
+    const start = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const end = endOfWeek(monthEnd, { weekStartsOn: 1 });
 
     try {
       // 1. Cargar todo en paralelo (Promise.all es clave para velocidad)

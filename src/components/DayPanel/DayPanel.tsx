@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format, isAfter, startOfDay, getDay, isBefore } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar as CalendarIcon, CheckSquare, ListTodo, PenLine, Settings, X, Plus, Trash2 } from 'lucide-react';
@@ -33,6 +33,7 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const [localNote, setLocalNote] = useState('');
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
 
   const isFuture = isAfter(startOfDay(selectedDate), startOfDay(new Date()));
@@ -71,6 +72,11 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
 
   // 3. Obtener Nota del día
   const todaysNoteContent = notes.find(n => n.date === dateStr)?.content || '';
+
+  // NUEVO: Esto fuerza a que el cuadro de texto cambie su contenido visual cuando haces click en otro día
+  useEffect(() => {
+    setLocalNote(todaysNoteContent);
+  }, [dateStr, todaysNoteContent]);
 
   // 4. Filtrar Eventos de Google
   const todaysEvents = googleEvents.filter(ev => ev.date === dateStr);
@@ -116,10 +122,10 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
     refreshData();
   };
 
-  const handleSaveNote = async (newContent: string) => {
-    if (newContent === todaysNoteContent) return; // Evitar guardado si no cambió
+  const handleSaveNote = async () => {
+    if (localNote === todaysNoteContent) return; // Comparamos contra localNote
     setIsSavingNote(true);
-    await saveDayNote(selectedDate, newContent);
+    await saveDayNote(selectedDate, localNote); // Guardamos localNote
     await refreshData();
     setIsSavingNote(false);
   };
@@ -269,9 +275,11 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
           {isSavingNote && <span style={{fontSize:'0.7rem', color:'var(--color-secondary)'}}>Guardando...</span>}
         </div>
         <textarea 
-          className="notes-area" placeholder={`Escribe algo...`}
-          defaultValue={todaysNoteContent} // Usamos defaultValue para que sea editable
-          onBlur={(e) => handleSaveNote(e.target.value)}
+          className="notes-area" 
+          placeholder={`Escribe algo...`}
+          value={localNote} 
+          onChange={(e) => setLocalNote(e.target.value)}
+          onBlur={handleSaveNote}
         />
       </section>
 

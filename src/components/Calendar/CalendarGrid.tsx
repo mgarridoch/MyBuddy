@@ -23,13 +23,12 @@ interface CalendarGridProps {
 }
 
 export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDateSelect, refreshTrigger }) => {
-  const [currentMonthView, setCurrentMonthView] = useState(new Date());
+  const { notes, tasks, currentMonthView, setCurrentMonthView } = useData();
   const { session } = useAuth();
   // DATOS REALES
   const [habits, setHabits] = useState<Habit[]>([]);
   const [monthLogs, setMonthLogs] = useState<{ habit_id: number; date: string }[]>([]);
   const [, setLoading] = useState(false);
-  const { notes } = useData(); 
 
   // Definir rango visual del calendario
   const monthStart = startOfMonth(currentMonthView);
@@ -143,6 +142,9 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDate
             if (!a.isAllDay && b.isAllDay) return 1;
             return (a.time || '').localeCompare(b.time || '');
           });
+          const dayTasks = tasks.filter(t => t.date === dayStr);
+          const totalTasks = dayTasks.length;
+          const completedTasks = dayTasks.filter(t => t.completed).length;
 
           // Limite visual: Solo mostramos los primeros 3
           const MAX_VISIBLE = 3;
@@ -160,10 +162,33 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDate
               onClick={() => onDateSelect(day)}
             >
               {/* HEADER DE LA CELDA (Nota izq, Número der) */}
-              <div style={{display:'flex', justifyContent:'space-between', width:'100%', marginBottom:'2px'}}>
-                {/* ICONO NOTA */}
-                <div style={{color: 'var(--color-primary)', opacity: hasNote ? 1 : 0}}>
-                  <FileText size={14} />
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', width:'100%', marginBottom:'2px'}}>
+                {/* ZONA IZQUIERDA: NOTAS Y TAREAS */}
+                <div style={{display:'flex', gap:'4px', alignItems:'center'}}>
+                  {/* ICONO NOTA */}
+                  {hasNote && (
+                    <div style={{color: 'var(--color-primary)'}} title="Tiene notas">
+                      <FileText size={14} />
+                    </div>
+                  )}
+                  
+                  {/* NUEVO: CONTADOR DE TAREAS (Solo si hay tareas) */}
+                  {totalTasks > 0 && (
+                    <span 
+                      title={`${completedTasks} de ${totalTasks} tareas completadas`}
+                      style={{
+                        fontSize: '0.65rem', 
+                        fontWeight: 700, 
+                        // Color verde/morado si están todas listas, sino gris
+                        color: completedTasks === totalTasks ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                        backgroundColor: 'var(--color-input-bg)',
+                        padding: '1px 4px',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      {completedTasks}/{totalTasks}
+                    </span>
+                  )}
                 </div>
                 {/* NÚMERO DEL DÍA */}
                 <span className="day-number">{format(day, 'd')}</span>
