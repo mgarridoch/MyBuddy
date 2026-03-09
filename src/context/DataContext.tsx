@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { startOfMonth, endOfMonth, format, startOfWeek, endOfWeek } from 'date-fns';
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { useAuth } from './AuthContext';
 import { getMyHabits, getRangeLogs } from '../services/habitService';
 import { getTasksRange, getNotesRange } from '../services/dailyService';
