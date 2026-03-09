@@ -54,7 +54,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: window.location.href,
           scopes: 'https://www.googleapis.com/auth/calendar',
           queryParams: {
             access_type: 'offline',
