@@ -49,22 +49,42 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // --- EL GUARDIA DE SEGURIDAD DE GOOGLE ---
     // Si la sesión de MyBuddy existe, pero el token de Google se borró por inactividad...
     if (!session.provider_token) {
-      console.warn("Token de Google ausente por inactividad. Refrescando sesión silenciosamente...");
+      
+      // 1. Verificar si estamos en medio de una redirección (la URL tiene tokens)
+      if (window.location.hash.includes('access_token') || window.location.hash.includes('provider_token')) {
+        console.log("⏳ Supabase está procesando el token de la URL. Esperando...");
+        return; // Detenemos la carga y dejamos que Supabase termine su trabajo
+      }
+
+      // 2. Sistema Anti-Bucle Infinito (Cooldown de 10 segundos)
+      const lastRedirect = sessionStorage.getItem('lastGoogleRedirect');
+      const now = Date.now();
+      
+      if (lastRedirect && now - parseInt(lastRedirect) < 10000) {
+        console.error("❌ Bucle detectado. Redirección cancelada por seguridad.");
+        // Si entra en bucle, mejor detenerse que colapsar el navegador
+        return; 
+      }
+
+      console.warn("🔄 Token de Google ausente o vencido. Refrescando sesión...");
+      sessionStorage.setItem('lastGoogleRedirect', now.toString()); // Anotar la hora del salto
       
       supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.href,
+          redirectTo: window.location.href, 
           scopes: 'https://www.googleapis.com/auth/calendar',
           queryParams: {
             access_type: 'offline',
-            // LA MAGIA ESTÁ AQUÍ: Le decimos a Google exactamente quién eres
-            // para que no te muestre la pantalla de "Elige una cuenta"
             login_hint: session.user.email || '' 
           }
         }
       });
       return; 
+    } else {
+      // Si llegamos aquí, el token existe y es válido
+      console.log("✅ Token de Google recibido correctamente.");
+      sessionStorage.removeItem('lastGoogleRedirect'); // Limpiamos el seguro anti-bucles
     }
 
     // 2. Cambiamos cómo calculamos start y end
