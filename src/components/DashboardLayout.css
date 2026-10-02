@@ -29,6 +29,6 @@
     /* CAMBIO 2: Darle más espacio al calendario (3 partes vs 1 parte del panel) */
     /* Antes era 2fr 1fr */
     grid-template-columns: 3fr 1fr; 
-    padding: 2rem;
+    padding: 1rem;
   }
 }

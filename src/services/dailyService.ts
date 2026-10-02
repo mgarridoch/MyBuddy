@@ -17,11 +17,24 @@ export const getTasks = async (date: Date) => {
   return data as Task[];
 };
 
-export const createTask = async (title: string, date: Date) => {
-  const dateStr = format(date, 'yyyy-MM-dd');
+export const createTask = async (
+  title: string, 
+  date?: Date, // Opcional
+  category: string = 'Inbox',
+  description?: string
+) => {
+  // Si hay fecha, la formateamos, si no, null
+  const dateStr = date ? format(date, 'yyyy-MM-dd') : null;
+  
   const { data, error } = await supabase
     .from('tasks')
-    .insert([{ title, date: dateStr, completed: false }])
+    .insert([{ 
+      title, 
+      date: dateStr, 
+      completed: false,
+      category,
+      description
+    }])
     .select()
     .single();
 
@@ -30,9 +43,14 @@ export const createTask = async (title: string, date: Date) => {
 };
 
 export const toggleTask = async (taskId: number, completed: boolean) => {
+  const completedAt = completed ? new Date().toISOString() : null;
+
   const { error } = await supabase
     .from('tasks')
-    .update({ completed })
+    .update({ 
+      completed,
+      completed_at: completedAt // Guardamos la hora exacta
+    })
     .eq('id', taskId);
 
   if (error) throw error;
@@ -109,4 +127,28 @@ export const getNotesRange = async (start: Date, end: Date) => {
 
   if (error) throw error;
   return data as DayNote[]; // Asegúrate de tener la interfaz DayNote exportada en types
+};
+
+// Obtener TODAS las tareas (o filtrar por categoría)
+// Por defecto trae las pendientes primero.
+export const getAllTasks = async () => {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .order('completed', { ascending: true }) // Las pendientes (false) primero
+    .order('date', { ascending: true, nullsFirst: true }) // Las sin fecha primero, luego cronológico
+    .order('created_at', { ascending: false }); // Las más nuevas creadas primero si hay empate
+
+  if (error) throw error;
+  return data as Task[];
+};
+
+// Actualizar una tarea completa (título, fecha, desc, cat)
+export const updateTaskDetails = async (taskId: number, updates: Partial<Task>) => {
+  const { error } = await supabase
+    .from('tasks')
+    .update(updates)
+    .eq('id', taskId);
+
+  if (error) throw error;
 };

@@ -18,9 +18,14 @@ export interface Task {
   id: number;
   user_id: string;
   title: string;
-  date: string;
+  // CAMBIO: Ahora date es opcional (?) porque puede no estar agendada
+  date?: string; 
   completed: boolean;
   created_at: string;
+  // NUEVOS CAMPOS:
+  description?: string;
+  category: string;
+  completed_at?: string;
 }
 
 export interface DayNote {

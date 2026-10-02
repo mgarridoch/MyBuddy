@@ -97,9 +97,10 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
 // 1. Función genérica para guardar (sin depender del evento)
   const submitNewTask = async () => {
     if (newTaskTitle.trim()) {
-      const titleToSave = newTaskTitle; // Guardamos ref local
-      setNewTaskTitle(''); // Limpiamos UI rápido
-      await createTask(titleToSave, selectedDate);
+      const titleToSave = newTaskTitle;
+      setNewTaskTitle(''); 
+      // CAMBIO AQUÍ: Llamamos con los nuevos parámetros (Inbox por defecto)
+      await createTask(titleToSave, selectedDate, 'Inbox'); 
       refreshData();
     }
   };

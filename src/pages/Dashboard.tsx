@@ -23,7 +23,7 @@ export const Dashboard: React.FC = () => {
     <DashboardLayout onOpenSettings={() => setIsSettingsOpen(true)}>
       
       {/* IZQUIERDA: Calendario */}
-      <div style={{ backgroundColor: 'var(--color-white)', borderRadius: 'var(--radius-lg)', padding: '20px', boxShadow: 'var(--shadow-card)' }}>
+      <div style={{ backgroundColor: 'var(--color-white)', borderRadius: 'var(--radius-lg)', padding: '10px', boxShadow: 'var(--shadow-card)' }}>
         <CalendarGrid 
           selectedDate={selectedDate} 
           onDateSelect={setSelectedDate} 

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { useAuth } from './AuthContext';
 import { getMyHabits, getRangeLogs } from '../services/habitService';
-import { getTasksRange, getNotesRange } from '../services/dailyService';
+import { getTasksRange, getNotesRange, getAllTasks } from '../services/dailyService';
 import { getGoogleEventsForMonth } from '../services/googleService';
 import { getAppSettings, saveAppSettings } from '../services/settingsService';
 import type { Habit, Task, DayNote, AppSettings } from '../types';
@@ -12,6 +12,7 @@ interface DataContextType {
   habits: Habit[];
   habitLogs: { habit_id: number; date: string }[];
   tasks: Task[];
+  allTasks: Task[]; 
   notes: DayNote[];
   googleEvents: any[];
   appSettings: AppSettings;
@@ -32,6 +33,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<any[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
   const [notes, setNotes] = useState<DayNote[]>([]);
   const [googleEvents, setGoogleEvents] = useState<any[]>([]);
   const [appSettings, setAppSettingsState] = useState<AppSettings>({
@@ -103,14 +105,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const [
-        fetchedHabits, fetchedLogs, fetchedTasks, fetchedNotes, fetchedGoogle, fetchedSettings
+        fetchedHabits, fetchedLogs, fetchedTasks, fetchedNotes, fetchedGoogle, fetchedSettings, fetchedAllTasks
       ] = await Promise.all([
         getMyHabits(),
         getRangeLogs(start, end),
         getTasksRange(start, end),
         getNotesRange(start, end),
         session.provider_token ? getGoogleEventsForMonth(session.provider_token, start, end) : [],
-        getAppSettings()
+        getAppSettings(),
+        getAllTasks()
       ]);
       
       setHabits(fetchedHabits);
@@ -119,7 +122,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setNotes(fetchedNotes);
       setGoogleEvents(fetchedGoogle || []);
       setAppSettingsState(fetchedSettings || { show_stats: true, show_calendar: true, show_sports: true, theme: 'light' });
-
+      setAllTasks(fetchedAllTasks);
     } catch (error: any) {
       console.error("Error cargando datos:", error);
 
@@ -163,7 +166,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <DataContext.Provider value={{
-      habits, habitLogs, tasks, notes, googleEvents, appSettings, updateAppSettings,
+      habits, habitLogs, tasks, notes, googleEvents, appSettings, updateAppSettings, allTasks,
       loading, refreshData: loadMonthData, currentMonthView, setCurrentMonthView
     }}>
       {children}

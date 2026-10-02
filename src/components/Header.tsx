@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart2, Calendar, Dumbbell, Settings } from 'lucide-react'; // Iconos lindos
+import { BarChart2, Calendar, Dumbbell, Settings, ListTodo  } from 'lucide-react'; // Iconos lindos
 import './Header.css';
 import { useAuth } from '../context/AuthContext';
 import { LogOut } from 'lucide-react';
@@ -44,6 +44,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCalendarSettings }) => {
             <span className="nav-text">Calendario</span>
           </button>
         )}
+
+        {/* BOTÓN TAREAS (GTD) */}
+        <button 
+          className={`nav-btn ${isActive('/tasks') ? 'active' : ''}`}
+          onClick={() => navigate('/tasks')}
+        >
+          <ListTodo size={20} />
+          <span className="nav-text">Tareas</span>
+        </button>
         
         {/* BOTÓN DEPORTE */}
         {appSettings.show_sports && (
