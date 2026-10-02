@@ -1,0 +1,177 @@
+.task-modal-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 550px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.task-modal-header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Título editable destacado */
+.task-title-input {
+  width: 100%;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  background: transparent;
+  border: none;
+  outline: none;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+}
+.task-title-input:focus {
+  border-bottom-color: var(--color-primary);
+}
+
+/* Área de descripción */
+.task-desc-textarea {
+  width: 100%;
+  min-height: 120px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+.task-desc-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Fila de Propiedades (Fecha y Categoría) */
+.task-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 500px) {
+  .task-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-field input {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-input-bg);
+  color: var(--color-text-main);
+  font-size: 0.9rem;
+}
+.meta-field input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.btn-clear-date {
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: right;
+  padding: 0;
+  margin-top: 2px;
+}
+
+/* Footer con acciones */
+.task-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg);
+}
+
+/* WRAPPER PARA EL COMBOBOX */
+.category-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* MENÚ DESPLEGABLE FLOTANTE */
+.category-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+/* CADA OPCIÓN DEL DESPLEGABLE */
+.category-dropdown-item {
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.category-dropdown-item:hover {
+  background-color: var(--color-input-bg);
+  color: var(--color-primary);
+  padding-left: 18px; /* Pequeño desplazamiento interactivo */
+}
+
+/* Indicador cuando la categoría es nueva */
+.category-new-badge {
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  font-style: italic;
+}

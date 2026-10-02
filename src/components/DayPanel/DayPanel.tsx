@@ -15,6 +15,8 @@ import confetti from 'canvas-confetti';
 
 // Importamos el Modal Nuevo
 import { AddEventModal } from '../Calendar/AddEventModal'; 
+import { TaskDetailModal } from '../Tasks/TaskDetailModal';
+import type { Task } from '../../types';
 
 interface DayPanelProps {
   selectedDate: Date;
@@ -38,6 +40,8 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
 
   const isFuture = isAfter(startOfDay(selectedDate), startOfDay(new Date()));
   const dateStr = format(selectedDate, 'yyyy-MM-dd');
+
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
   // ---------------------------------------------------------
   // FILTRADO INSTANTÁNEO EN MEMORIA (Sin carga)
@@ -221,12 +225,22 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
           {/* A. MOSTRAR PRIMERO LAS PENDIENTES */}
           {pendingTasks.map(task => (
             <div key={task.id} className="item-row" style={{justifyContent: 'space-between'}}>
-              <label style={{display:'flex', gap:'10px', alignItems:'center', flex: 1, cursor:'pointer'}}>
-                <input type="checkbox" className="custom-checkbox" checked={task.completed} onChange={(e) => handleToggleTask(task.id, e.target.checked)} />
-                <span className="item-text">{task.title}</span>
-              </label>
-              <button onClick={() => handleDeleteTask(task.id)} style={{color: 'var(--color-text-muted)', cursor:'pointer'}}><X size={14}/></button>
-            </div>
+            <label style={{display:'flex', gap:'10px', alignItems:'center', flex: 1, cursor:'pointer'}}>
+              <input type="checkbox" className="custom-checkbox" checked={task.completed} onChange={(e) => handleToggleTask(task.id, e.target.checked)} />
+              {/* Al hacer click en el texto se abre el modal de edición profunda */}
+              <span 
+                className="item-text" 
+                onClick={(e) => {
+                  e.preventDefault(); // Evita marcar el checkbox
+                  setTaskToEdit(task);
+                }}
+                title="Click para ver notas y detalles"
+              >
+                {task.title}
+              </span>
+            </label>
+            <button onClick={() => handleDeleteTask(task.id)} style={{color: 'var(--color-text-muted)', cursor:'pointer'}}><X size={14}/></button>
+          </div>
           ))}
 
           {/* B. BOTÓN PARA MOSTRAR/OCULTAR COMPLETADAS */}
@@ -249,6 +263,16 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
             <div key={task.id} className="item-row" style={{justifyContent: 'space-between', opacity: 0.6}}>
               <label style={{display:'flex', gap:'10px', alignItems:'center', flex: 1, cursor:'pointer'}}>
                 <input type="checkbox" className="custom-checkbox" checked={task.completed} onChange={(e) => handleToggleTask(task.id, e.target.checked)} />
+                {/* Al hacer click en el texto se abre el modal de edición profunda */}
+                <span 
+                  className="item-text" 
+                  onClick={(e) => {
+                    e.preventDefault(); // Evita marcar el checkbox
+                    setTaskToEdit(task);
+                  }}
+                  title="Click para ver notas y detalles"
+                >
+                </span>
                 <span className="item-text completed">{task.title}</span>
               </label>
               <button onClick={() => handleDeleteTask(task.id)} style={{color: 'var(--color-text-muted)', cursor:'pointer'}}><X size={14}/></button>
@@ -288,6 +312,12 @@ export const DayPanel: React.FC<DayPanelProps> = ({ selectedDate, onDataChange, 
         isOpen={isAddEventOpen} onClose={() => setIsAddEventOpen(false)} 
         selectedDate={selectedDate}
         onSuccess={() => { onDataChange(); refreshData(); }}
+      />
+      <TaskDetailModal 
+        task={taskToEdit}
+        isOpen={!!taskToEdit}
+        onClose={() => setTaskToEdit(null)}
+        onSuccess={refreshData}
       />
     </div>
   );

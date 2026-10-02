@@ -5,6 +5,8 @@ import { format, isBefore, isToday, isAfter, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { CheckCircle, Circle, Calendar as CalIcon, Folder, Plus, Inbox, AlertCircle, Sun, CalendarDays } from 'lucide-react';
 import { toggleTask, createTask } from '../../services/dailyService';
+import { TaskDetailModal } from '../../components/Tasks/TaskDetailModal';
+import type { Task } from '../../types'; 
 import './TasksPage.css';
 
 type FilterType = 'all' | 'today' | 'overdue' | 'upcoming' | 'no-date' | 'category';
@@ -16,6 +18,8 @@ export const TasksPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('Inbox');
   const [newTaskInput, setNewTaskInput] = useState('');
+
+  const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<Task | null>(null);
 
   // 1. EXTRAER CATEGORÍAS ÚNICAS
   const categories = useMemo(() => {
@@ -185,10 +189,17 @@ export const TasksPage: React.FC = () => {
               const badge = getDateBadgeProps(task.date);
 
               return (
-                <div key={task.id} className="task-card">
+                  <div 
+                    key={task.id} 
+                    className={`task-card ${task.completed ? 'completed' : ''}`}
+                    onClick={() => setSelectedTaskForEdit(task)} // <--- ABRIR MODAL
+                  >
                   {/* Botón de Checkbox gigante */}
                   <button 
-                    onClick={() => handleToggle(task.id, task.completed)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // <-- IMPORTANTE
+                      handleToggle(task.id, task.completed);
+                    }}
                     style={{background:'none', border:'none', cursor:'pointer', marginTop:'2px'}}
                   >
                     {task.completed ? <CheckCircle size={24} color="var(--color-primary)"/> : <Circle size={24} color="var(--color-text-muted)"/>}
@@ -232,7 +243,14 @@ export const TasksPage: React.FC = () => {
 
           </div>
         </div>
-      </div>
+        
+      <TaskDetailModal 
+        task={selectedTaskForEdit}
+        isOpen={!!selectedTaskForEdit}
+        onClose={() => setSelectedTaskForEdit(null)}
+        onSuccess={refreshData}
+      />
+    </div>
     </DashboardLayout>
   );
 };
