@@ -89,14 +89,14 @@ export const TasksPage: React.FC = () => {
   };
 
   // 4. HELPERS VISUALES
-  const getDateBadgeProps = (dateStr?: string) => {
+  const getDateBadgeProps = (dateStr?: string | null) => {
     if (!dateStr) return null;
     const taskDate = startOfDay(new Date(dateStr + 'T00:00:00'));
     const today = startOfDay(new Date());
 
     if (isToday(taskDate)) return { class: 'today', text: 'Hoy' };
     if (isBefore(taskDate, today)) return { class: 'overdue', text: format(taskDate, "d MMM", { locale: es }) };
-    return { class: 'future', text: format(taskDate, "d MMM", { locale: es }) }; // Futuro
+    return { class: 'future', text: format(taskDate, "d MMM", { locale: es }) };
   };
 
   const getTitle = () => {
@@ -186,7 +186,7 @@ export const TasksPage: React.FC = () => {
 
             {/* LISTA DE TARJETAS */}
             {filteredTasks.map(task => {
-              const badge = getDateBadgeProps(task.date);
+              const badge = getDateBadgeProps(task.date); 
 
               return (
                   <div 
