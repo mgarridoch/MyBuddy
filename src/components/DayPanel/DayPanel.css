@@ -3,104 +3,312 @@
 .panel-container {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1.1rem;
   height: 100%;
 }
 
-/* Ajuste móvil: Dar espacio abajo para que no choque con el borde del navegador */
-@media (max-width: 900px) {
+@media (max-width: 899px) {
   .panel-container {
-    padding-bottom: 80px; 
+    padding-bottom: 20px;
   }
 }
 
 .panel-header {
-  border-bottom: 2px solid var(--color-bg);
-  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+  padding-bottom: 0.75rem;
 }
 
 .panel-date-title {
   color: var(--color-primary);
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
   text-transform: capitalize;
+  margin: 0;
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .section-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--color-primary);
-  margin-bottom: 0.4rem;
 }
 
-/* LISTAS DE ITEMS (Rutinas/Tareas) */
+.section-counter-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background-color: rgba(124, 58, 237, 0.16);
+  color: var(--color-primary);
+}
+
+.section-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.section-icon-btn.muted {
+  color: var(--color-text-muted);
+}
+
+.section-icon-btn:hover {
+  background-color: var(--color-input-bg);
+}
+
+.section-icon-btn:active {
+  transform: scale(0.92);
+}
+
+.google-reconnect-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background-color: rgba(124, 58, 237, 0.15);
+  color: var(--color-primary);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  cursor: pointer;
+}
+
+/* Barra de progreso de rutinas */
+.habits-progress-track {
+  width: 100%;
+  height: 5px;
+  background-color: var(--color-input-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+
+.habits-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-primary));
+  border-radius: 999px;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.habits-progress-fill.complete {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+/* LISTAS DE ITEMS */
 .item-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .item-row {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  /* MODIFICADO: Más padding para facilitar el toque en móvil */
-  padding: 0.3rem 0.5rem;
-  margin-bottom: 0;
-  border-radius: var(--radius-sm);
-  transition: background 0.2s;
-  min-height: 36px;
+  gap: 0.75rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm, 8px);
+  transition: background-color 0.15s ease, opacity 0.2s ease;
+  min-height: 40px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.clickable-row {
+  cursor: pointer;
+  user-select: none;
 }
 
 .item-row:hover {
   background-color: var(--color-input-bg);
 }
 
+/* Tarjetas de Eventos de Google */
+.event-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm, 8px);
+  background-color: var(--color-input-bg);
+}
+
+.event-card-accent {
+  display: flex;
+  flex-direction: column;
+  border-left: 4px solid var(--color-primary);
+  padding-left: 10px;
+  gap: 1px;
+}
+
+.event-time-badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.event-title-text {
+  font-weight: 500;
+}
+
+/* Filas de Tareas */
+.task-row {
+  justify-content: space-between;
+}
+
+.completed-row {
+  opacity: 0.6;
+}
+
+.task-title-btn {
+  flex: 1;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+}
+
+.row-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.15s ease;
+}
+
+.row-action-btn:hover {
+  opacity: 1;
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.completed-tasks-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 6px 4px;
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+/* Input de Nueva Tarea */
+.new-task-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.5rem;
+  margin-top: 2px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px dashed rgba(124, 58, 237, 0.25);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.new-task-input-row:focus-within {
+  border-color: var(--color-primary);
+  background-color: var(--color-input-bg);
+}
+
+.new-task-plus-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.new-task-input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  outline: none;
+  font-size: 0.92rem;
+  color: var(--color-text-main);
+  font-family: inherit;
+}
+
+.new-task-input::placeholder {
+  color: var(--color-text-muted);
+}
+
 /* CHECKBOX PERSONALIZADO */
 .custom-checkbox {
-  appearance: none; /* Borra el estilo por defecto del navegador */
-  /* MODIFICADO: Tamaño aumentado a 26px para mejor tacto */
+  appearance: none;
+  flex-shrink: 0;
   width: 22px;
   height: 22px;
   border: 2px solid var(--color-secondary);
-  /* MODIFICADO: Borde un poco más redondeado */
   border-radius: 6px;
   cursor: pointer;
   display: grid;
   place-content: center;
-  transition: all 0.2s;
-  background-color: transparent; /* Asegura fondo transparente si no está marcado */
+  transition: all 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+  background-color: transparent;
 }
 
-/* Cuando está marcado */
 .custom-checkbox:checked {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
+  transform: scale(1.03);
 }
 
-/* El "ticket" o "check" dentro */
 .custom-checkbox::before {
   content: "";
-  /* MODIFICADO: Ticket interno ligeramente más grande */
   width: 10px;
   height: 10px;
   background-color: white;
-  transform: scale(0); 
-  transition: 0.2s transform ease-in-out;
+  transform: scale(0);
+  transition: 0.15s transform ease-in-out;
   clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
 
 .custom-checkbox:checked::before {
-  transform: scale(1); 
+  transform: scale(1);
 }
 
 .item-text {
-  color: var(--color-text-main); /* Asegurar que se lea en oscuro */
-  font-size: 0.95rem;
-  line-height: 1.4; /* Mejora lectura si el texto es largo */
+  color: var(--color-text-main);
+  font-size: 0.94rem;
+  line-height: 1.35;
+  transition: color 0.15s ease;
 }
 
 .item-text.completed {
@@ -109,35 +317,46 @@
 }
 
 /* NOTAS TEXTAREA */
+.note-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.note-status-badge.saved {
+  color: #34d399;
+}
+
 .notes-area {
   width: 100%;
-  min-height: 120px;
-  border: 1px solid var(--color-border); 
-  border-radius: var(--radius-sm);
-  padding: 0.8rem;
+  min-height: 115px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.75rem;
   font-family: inherit;
-  font-size: 1rem; /* Letra un poco más grande para escribir cómodo */
+  font-size: 0.95rem;
+  line-height: 1.45;
   resize: vertical;
   background-color: var(--color-input-bg);
-  color: var(--color-text-main);  
+  color: var(--color-text-main);
+  transition: border-color 0.2s ease;
 }
+
 .notes-area::placeholder {
   color: var(--color-text-muted);
 }
 
 .notes-area:focus {
-  outline: 2px solid var(--color-primary);
-  /* En focus, mantenemos el fondo oscuro */
-  background-color: var(--color-input-bg); 
+  outline: none;
+  border-color: var(--color-primary);
 }
 
 .empty-msg {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: var(--color-text-muted);
   font-style: italic;
-  padding: 0.5rem;
-}
-
-.item-row div[style*="borderLeft"] {
-  padding-left: 8px !important;
+  padding: 0.4rem 0.2rem;
 }

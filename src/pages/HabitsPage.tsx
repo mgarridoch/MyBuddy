@@ -1,200 +1,279 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Plus, Save, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Plus, Check, X, Sparkles, CalendarCheck2 } from 'lucide-react';
+import { DashboardLayout } from '../components/DashboardLayout';
 import { HabitRow } from '../components/Habits/HabitRow';
-// Importamos las nuevas funciones del servicio
-import { getMyHabits, createHabit, deleteHabit, updateHabitFrequency, updateHabitName } from '../services/habitService';
-import type { Habit } from '../types';
+import {
+  createHabit,
+  deleteHabit,
+  updateHabitFrequency,
+  updateHabitName,
+} from '../services/habitService';
+import { useData } from '../context/DataContext';
+import './HabitsPage.css';
+
+const DAYS_REF = [
+  { l: 'L', id: 1, full: 'Lun' },
+  { l: 'M', id: 2, full: 'Mar' },
+  { l: 'X', id: 3, full: 'Mié' },
+  { l: 'J', id: 4, full: 'Jue' },
+  { l: 'V', id: 5, full: 'Vie' },
+  { l: 'S', id: 6, full: 'Sáb' },
+  { l: 'D', id: 7, full: 'Dom' },
+];
 
 export const HabitsPage: React.FC = () => {
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Estado para el formulario de creación
+  const navigate = useNavigate();
+  const { habits, refreshData } = useData();
+
+  // Estado local optimista para que los clicks en L M X J V S D sean en 0ms
+  const [optimisticFreq, setOptimisticFreq] = useState<Record<number, number[]>>({});
+  const [optimisticNames, setOptimisticNames] = useState<Record<number, string>>({});
+  const [deletedIds, setDeletedIds] = useState<number[]>([]);
+
+  // Estado para el formulario de nueva rutina
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newFrequency, setNewFrequency] = useState<number[]>([1, 2, 3, 4, 5]); 
+  const [newFrequency, setNewFrequency] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [isSavingNew, setIsSavingNew] = useState(false);
 
-  useEffect(() => {
-    loadHabits();
-  }, []);
+  const visibleHabits = habits
+    .filter((h) => !deletedIds.includes(h.id))
+    .map((h) => ({
+      ...h,
+      name: optimisticNames[h.id] ?? h.name,
+      frequency: optimisticFreq[h.id] ?? h.frequency,
+    }));
 
-  const loadHabits = async () => {
+  // --- CREAR NUEVA RUTINA ---
+  const handleSaveNew = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!newName.trim() || newFrequency.length === 0 || isSavingNew) return;
+
+    setIsSavingNew(true);
     try {
-      const data = await getMyHabits();
-      setHabits(data);
-    } catch (error) {
-      console.error('Error cargando rutinas:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // --- LOGICA DE CREACIÓN ---
-  const handleSaveNew = async () => {
-    if (!newName.trim()) return;
-    try {
-      await createHabit(newName, newFrequency);
+      await createHabit(newName.trim(), [...newFrequency].sort());
       setNewName('');
+      setNewFrequency([1, 2, 3, 4, 5]);
       setIsCreating(false);
-      loadHabits(); 
+      await refreshData();
     } catch (error) {
       alert('Error guardando rutina');
+    } finally {
+      setIsSavingNew(false);
     }
   };
 
-  // --- LOGICA DE EDICIÓN (Interactive Row) ---
-  
-  // 1. Cambiar días (Click en los botones L M M...)
+  // --- CAMBIAR DÍAS (OPTIMISTA) ---
   const handleToggleDay = async (habitId: number, dayId: number) => {
-    // Buscamos el hábito en el estado actual
-    const habitToUpdate = habits.find(h => h.id === habitId);
+    const habitToUpdate = visibleHabits.find((h) => h.id === habitId);
     if (!habitToUpdate) return;
 
-    // Calculamos la nueva frecuencia
-    let newFreq = [];
-    if (habitToUpdate.frequency.includes(dayId)) {
-      newFreq = habitToUpdate.frequency.filter(d => d !== dayId); // Quitar
-    } else {
-      newFreq = [...habitToUpdate.frequency, dayId].sort(); // Agregar
-    }
+    const currentFreq = habitToUpdate.frequency;
+    const newFreq = currentFreq.includes(dayId)
+      ? currentFreq.filter((d) => d !== dayId)
+      : [...currentFreq, dayId].sort();
 
-    // Actualización OPTIMISTA (Actualizamos la UI antes de la BD para que se sienta rápido)
-    const updatedHabits = habits.map(h => h.id === habitId ? { ...h, frequency: newFreq } : h);
-    setHabits(updatedHabits);
+    // Evitamos dejar una rutina con 0 días activos por accidente
+    if (newFreq.length === 0) return;
 
-    // Guardar en BD
+    setOptimisticFreq((prev) => ({ ...prev, [habitId]: newFreq }));
+
     try {
       await updateHabitFrequency(habitId, newFreq);
+      refreshData();
     } catch (error) {
-      console.error("Error actualizando frecuencia", error);
-      loadHabits(); // Revertir si falla
+      console.error('Error actualizando frecuencia:', error);
+      setOptimisticFreq((prev) => {
+        const copy = { ...prev };
+        delete copy[habitId];
+        return copy;
+      });
     }
   };
 
-  // 2. Renombrar (Click en Editar)
-  const handleRename = async (habitId: number) => {
-    const habit = habits.find(h => h.id === habitId);
-    if (!habit) return;
+  // --- RENOMBRAR INLINE (SIN PROMPT DEL NAVEGADOR) ---
+  const handleRename = async (habitId: number, updatedName: string) => {
+    const clean = updatedName.trim();
+    if (!clean) return;
 
-    // Usamos un prompt nativo simple para editar el nombre
-    const newNameInput = prompt("Nuevo nombre para la rutina:", habit.name);
-    
-    if (newNameInput && newNameInput.trim() !== "" && newNameInput !== habit.name) {
-      // Actualizar UI
-      const updatedHabits = habits.map(h => h.id === habitId ? { ...h, name: newNameInput } : h);
-      setHabits(updatedHabits);
-
-      // Guardar en BD
-      try {
-        await updateHabitName(habitId, newNameInput);
-      } catch (error) {
-        console.error("Error renombrando", error);
-        loadHabits();
-      }
+    setOptimisticNames((prev) => ({ ...prev, [habitId]: clean }));
+    try {
+      await updateHabitName(habitId, clean);
+      refreshData();
+    } catch (error) {
+      console.error('Error renombrando:', error);
+      setOptimisticNames((prev) => {
+        const copy = { ...prev };
+        delete copy[habitId];
+        return copy;
+      });
     }
   };
 
-  // 3. Eliminar (Click en Eliminar)
+  // --- ELIMINAR ---
   const handleDelete = async (habitId: number) => {
-    if (confirm('¿Estás seguro de eliminar esta rutina? Perderás el historial asociado.')) {
-      try {
-        // UI Optimista
-        setHabits(habits.filter(h => h.id !== habitId));
-        // BD call
-        await deleteHabit(habitId);
-      } catch (error) {
-        loadHabits();
-      }
+    if (!confirm('¿Eliminar esta rutina? Perderás el historial de días completados.')) return;
+
+    setDeletedIds((prev) => [...prev, habitId]);
+    try {
+      await deleteHabit(habitId);
+      refreshData();
+    } catch (error) {
+      setDeletedIds((prev) => prev.filter((id) => id !== habitId));
     }
   };
 
-  // --- RENDER ---
-  
-  // Helper para el formulario de NUEVA rutina
   const toggleNewFrequencyDay = (dayId: number) => {
     if (newFrequency.includes(dayId)) {
-      setNewFrequency(newFrequency.filter(id => id !== dayId));
+      if (newFrequency.length > 1) {
+        setNewFrequency(newFrequency.filter((id) => id !== dayId));
+      }
     } else {
-      setNewFrequency([...newFrequency, dayId]);
+      setNewFrequency([...newFrequency, dayId].sort());
     }
   };
-  const daysRef = [{l:'L',id:1},{l:'M',id:2},{l:'M',id:3},{l:'J',id:4},{l:'V',id:5},{l:'S',id:6},{l:'D',id:7}];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-secondary)', padding: '2rem' }}>
-      <div style={{
-        maxWidth: '800px', margin: '0 auto', backgroundColor: 'var(--color-bg)',
-        borderRadius: 'var(--radius-lg)', padding: '2rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ marginBottom: '2rem' }}>
-          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
-            <ArrowLeft size={20} /> Volver
-          </Link>
-          <h1 style={{ textAlign: 'center', color: 'var(--color-primary)', marginTop: '1rem' }}>Tus rutinas</h1>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {loading ? <p>Cargando...</p> : habits.map(habit => (
-            // AQUI USAMOS EL COMPONENTE INTERACTIVO
-            <HabitRow 
-              key={habit.id} 
-              habit={habit}
-              onToggleDay={handleToggleDay}
-              onRename={handleRename}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-
-        {/* FORMULARIO DE CREACIÓN */}
-        {isCreating ? (
-          <div style={{
-            marginTop: '2rem', padding: '1.5rem', border: '2px solid var(--color-primary)',
-            borderRadius: 'var(--radius-md)', backgroundColor: 'white'
-          }}>
-            <h3 style={{color: 'var(--color-primary)', marginBottom: '10px'}}>Nueva Rutina</h3>
-            <input 
-              autoFocus type="text" placeholder="Ej: Meditar 5 minutos" 
-              value={newName} onChange={e => setNewName(e.target.value)}
-              style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid #ccc', fontSize: '1rem' }}
-            />
-            <p style={{marginTop: '10px', fontSize: '0.9rem', color: '#666'}}>Días activos:</p>
-            
-            <div className="days-grid" style={{marginTop: '10px'}}>
-              {daysRef.map(d => (
-                <button 
-                  key={d.id} onClick={() => toggleNewFrequencyDay(d.id)}
-                  className={`day-toggle ${newFrequency.includes(d.id) ? 'active' : ''}`}
-                >
-                  {d.l}
-                </button>
-              ))}
-            </div>
-            
-            <div style={{display: 'flex', gap: '10px', marginTop: '15px', justifyContent: 'flex-end'}}>
-              <button onClick={() => setIsCreating(false)} style={{display:'flex', alignItems:'center', gap: '5px', color: '#666'}}>
-                <X size={18}/> Cancelar
-              </button>
-              <button onClick={handleSaveNew} style={{
-                backgroundColor: 'var(--color-primary)', color: 'white', padding: '8px 16px',
-                borderRadius: 'var(--radius-sm)', display:'flex', alignItems:'center', gap: '5px'
-              }}>
-                <Save size={18}/> Guardar
-              </button>
+    <DashboardLayout isFullWidth={true}>
+      <div className="habits-page-wrapper">
+        {/* CABECERA */}
+        <header className="habits-page-header">
+          <div className="habits-title-block">
+            <button
+              type="button"
+              className="habits-back-btn"
+              onClick={() => navigate('/')}
+              title="Volver al calendario"
+            >
+              <ArrowLeft size={18} />
+            </button>
+            <div>
+              <h1>Mis Rutinas</h1>
+              <p>Configura qué hábitos quieres trackear cada día de la semana</p>
             </div>
           </div>
-        ) : (
-          <button onClick={() => setIsCreating(true)} style={{
-            marginTop: '2rem', width: '100%', padding: '1rem', backgroundColor: 'transparent',
-            border: '2px dashed var(--color-secondary)', borderRadius: 'var(--radius-md)',
-            color: 'var(--color-primary)', fontSize: '1rem', fontWeight: 600,
-            display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px'
-          }}>
-            <Plus size={20} /> Agregar nueva rutina
-          </button>
+
+          {!isCreating && (
+            <button
+              type="button"
+              className="habits-new-primary-btn"
+              onClick={() => setIsCreating(true)}
+            >
+              <Plus size={18} />
+              <span>Nueva rutina</span>
+            </button>
+          )}
+        </header>
+
+        {/* TARJETA CREAR NUEVA RUTINA (INLINE MODERNO) */}
+        {isCreating && (
+          <form className="habit-create-card animate-in" onSubmit={handleSaveNew}>
+            <div className="habit-create-top">
+              <Sparkles size={18} color="var(--color-primary)" />
+              <input
+                autoFocus
+                type="text"
+                placeholder="Nombre de la rutina (ej: 3H Estudio, Deporte, Leer...)"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+            </div>
+
+            <div className="habit-create-freq-row">
+              <div className="freq-presets">
+                <span className="freq-label">Frecuencia:</span>
+                <button
+                  type="button"
+                  className={`freq-preset-pill ${
+                    newFrequency.length === 7 ? 'active' : ''
+                  }`}
+                  onClick={() => setNewFrequency([1, 2, 3, 4, 5, 6, 7])}
+                >
+                  Todos los días
+                </button>
+                <button
+                  type="button"
+                  className={`freq-preset-pill ${
+                    newFrequency.join(',') === '1,2,3,4,5' ? 'active' : ''
+                  }`}
+                  onClick={() => setNewFrequency([1, 2, 3, 4, 5])}
+                >
+                  Lun – Vie
+                </button>
+                <button
+                  type="button"
+                  className={`freq-preset-pill ${
+                    newFrequency.join(',') === '6,7' ? 'active' : ''
+                  }`}
+                  onClick={() => setNewFrequency([6, 7])}
+                >
+                  Finde
+                </button>
+              </div>
+
+              <div className="days-grid">
+                {DAYS_REF.map((d) => (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => toggleNewFrequencyDay(d.id)}
+                    className={`day-toggle ${newFrequency.includes(d.id) ? 'active' : ''}`}
+                    title={d.full}
+                  >
+                    {d.l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="habit-create-actions">
+              <button
+                type="button"
+                className="task-btn-cancel"
+                onClick={() => setIsCreating(false)}
+              >
+                <X size={15} /> Cancelar
+              </button>
+              <button
+                type="submit"
+                className="task-btn-save"
+                disabled={!newName.trim() || isSavingNew}
+              >
+                <Check size={16} />
+                <span>{isSavingNew ? 'Guardando...' : 'Crear rutina'}</span>
+              </button>
+            </div>
+          </form>
         )}
+
+        {/* LISTA DE RUTINAS */}
+        <div className="habits-list-stack">
+          {visibleHabits.length === 0 ? (
+            <div className="habits-empty-card">
+              <CalendarCheck2 size={42} strokeWidth={1.5} />
+              <p>Aún no tienes rutinas configuradas</p>
+              <button
+                type="button"
+                className="habits-new-primary-btn"
+                onClick={() => setIsCreating(true)}
+              >
+                <Plus size={18} /> Crear mi primera rutina
+              </button>
+            </div>
+          ) : (
+            visibleHabits.map((habit) => (
+              <HabitRow
+                key={habit.id}
+                habit={habit}
+                onToggleDay={handleToggleDay}
+                onRename={handleRename}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };

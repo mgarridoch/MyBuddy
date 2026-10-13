@@ -1,0 +1,93 @@
+Folder PATH listing for volume Hard Wd Blue
+Volume serial number is 8613-32D1
+D:.
+|   App.tsx
+|   arbol.txt
+|   index.css
+|   main.tsx
+|   
++---assets
+|       react.svg
+|       
++---components
+|   |   DashboardLayout.css
+|   |   DashboardLayout.tsx
+|   |   Header.css
+|   |   Header.tsx
+|   |   ProtectedRoute.tsx
+|   |   
+|   +---Calendar
+|   |       AddEventModal.tsx
+|   |       CalendarGrid.css
+|   |       CalendarGrid.tsx
+|   |       CalendarSettingsModal.tsx
+|   |       
+|   +---DayPanel
+|   |       DayPanel.css
+|   |       DayPanel.tsx
+|   |       
+|   +---Habits
+|   |       HabitRow.css
+|   |       HabitRow.tsx
+|   |       
+|   +---Settings
+|   |       SettingsModal.css
+|   |       SettingsModal.tsx
+|   |       
+|   +---Sports
+|   |       CreateExerciseModal.tsx
+|   |       ExerciseDetailModal.tsx
+|   |       RoutineBuilderModal.tsx
+|   |       
+|   +---Stats
+|   |       AddProgressModal.tsx
+|   |       WeightChart.tsx
+|   |       
+|   \---Tasks
+|           TaskDetailModal.css
+|           TaskDetailModal.tsx
+|           
++---context
+|       AuthContext.tsx
+|       DataContext.tsx
+|       WorkoutContext.tsx
+|       
++---hooks
++---pages
+|   |   Dashboard.tsx
+|   |   HabitsPage.tsx
+|   |   LoginPage.tsx
+|   |   MobileDayPage.tsx
+|   |   PrivacyPage.tsx
+|   |   
+|   +---Sports
+|   |       ExercisesPage.css
+|   |       ExercisesPage.tsx
+|   |       RoutinesPage.css
+|   |       RoutinesPage.tsx
+|   |       SportsHub.css
+|   |       SportsHub.tsx
+|   |       StatsPage.css
+|   |       StatsPage.tsx
+|   |       WorkoutSession.css
+|   |       WorkoutSessionPage.tsx
+|   |       
+|   \---Tasks
+|           TasksPage.css
+|           TasksPage.tsx
+|           
++---services
+|       dailyService.ts
+|       googleService.ts
+|       habitService.ts
+|       settingsService.ts
+|       sportService.ts
+|       statsService.ts
+|       supabase.ts
+|       
++---styles
+|       variables.css
+|       
+\---types
+        index.ts
+        

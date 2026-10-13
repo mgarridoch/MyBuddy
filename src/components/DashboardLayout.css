@@ -6,29 +6,123 @@
 
 .main-content {
   flex: 1;
-  padding: 1rem;
-  /* CAMBIO 1: Aumentar el ancho máximo para aprovechar pantallas grandes */
-  max-width: 1800px; 
+  padding: 0.75rem;
+  max-width: 1800px;
   width: 100%;
   margin: 0 auto;
-  
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: 1fr; 
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .layout-full-width {
-  display: block !important; /* Desactivar Grid */
-  max-width: 1200px; /* Ancho cómodo */
+  display: block !important;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+/* Tarjetas del Dashboard */
+.dashboard-calendar-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-daypanel-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-secondary);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Barra superior de día para Móvil */
+.mobile-day-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  position: sticky;
+  top: 8px;
+  z-index: 20;
+  box-shadow: var(--shadow-card);
+}
+
+.mobile-day-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.mobile-day-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  color: var(--color-text-main);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-day-title {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  min-width: 110px;
+}
+
+.mobile-day-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-text-main);
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+.mobile-day-date {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.mobile-calendar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background-color: rgba(124, 58, 237, 0.15);
+  color: var(--color-text-main);
+  border: 1px solid var(--color-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-calendar-toggle.active {
+  background-color: var(--color-secondary);
+  color: white;
 }
 
 @media (min-width: 900px) {
   .main-content {
-    /* CAMBIO 2: Darle más espacio al calendario (3 partes vs 1 parte del panel) */
-    /* Antes era 2fr 1fr */
-    grid-template-columns: 3fr 1fr; 
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 1.5rem;
     padding: 1rem;
+  }
+}
+@media (max-width: 899px) {
+  .main-content {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
 }

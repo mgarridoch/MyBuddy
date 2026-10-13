@@ -1,228 +1,222 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
-  eachDayOfInterval, isSameMonth, isSameDay, addMonths, 
-  subMonths, isToday, getDay, startOfDay, isBefore 
+import React from 'react';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+  isToday,
+  getDay,
+  startOfDay,
+  isBefore,
+  isAfter,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, FileText } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { getGoogleEventsRange } from '../../services/googleService';
-import type { CalendarEventSimple } from '../../services/googleService';
 import './CalendarGrid.css';
 import { useData } from '../../context/DataContext';
-
-// Importamos servicios y tipos
-import { getMyHabits, getRangeLogs } from '../../services/habitService';
-import type { Habit } from '../../types';
 
 interface CalendarGridProps {
   selectedDate: Date;
   onDateSelect: (date: Date) => void;
-  refreshTrigger: number; 
+  refreshTrigger?: number;
 }
 
-export const CalendarGrid: React.FC<CalendarGridProps> = ({ selectedDate, onDateSelect, refreshTrigger }) => {
-  const { notes, tasks, currentMonthView, setCurrentMonthView } = useData();
-  const { session } = useAuth();
-  // DATOS REALES
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [monthLogs, setMonthLogs] = useState<{ habit_id: number; date: string }[]>([]);
-  const [, setLoading] = useState(false);
+export const CalendarGrid: React.FC<CalendarGridProps> = ({
+  selectedDate,
+  onDateSelect,
+}) => {
+  // Usamos TODOS los datos directamente desde DataContext (Cero llamadas duplicadas a la API)
+  const {
+    habits,
+    habitLogs,
+    notes,
+    tasks,
+    googleEvents,
+    currentMonthView,
+    setCurrentMonthView,
+  } = useData();
 
-  // Definir rango visual del calendario
+  // Rango visual del calendario (Lunes a Domingo)
   const monthStart = startOfMonth(currentMonthView);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
   const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
 
   const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
-  const weekDays = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
+  const weekDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEventSimple[]>([]);
-
-  // --- CARGAR DATOS AL CAMBIAR DE MES ---
-  useEffect(() => {
-    const fetchCalendarData = async () => {
-      setLoading(true);
-      try {
-        // 1. Traemos las definiciones de hábitos
-        const userHabits = await getMyHabits();
-        setHabits(userHabits);
-
-        // 2. Traemos los logs SOLO de lo que se ve en pantalla (optimización)
-        const logs = await getRangeLogs(startDate, endDate);
-        setMonthLogs(logs);
-
-        // 3. EVENTOS GOOGLE (Con detalles)
-        if (session?.provider_token) {
-          try {
-            const events = await getGoogleEventsRange(session.provider_token, startDate, endDate);
-            setCalendarEvents(events);
-          } catch (err) { console.error(err); }
-        }
-
-      } catch (error) {
-        console.error("Error cargando calendario:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCalendarData();
-  }, [currentMonthView, refreshTrigger]); // Se recarga si cambias de mes (click en flechitas) o si cambia refreshTrigger
-
-
-  // --- CALCULADORA DE PROGRESO ---
+  // --- CALCULADORA DE PROGRESO EN MEMORIA ---
   const calculateDailyProgress = (day: Date) => {
-    // Si es futuro, no mostrar barra
-    if (day > new Date()) return null;
+    const today = startOfDay(new Date());
+    if (isAfter(startOfDay(day), today)) return null;
 
     const dayStr = format(day, 'yyyy-MM-dd');
-    let dayOfWeek = getDay(day); 
-    if (dayOfWeek === 0) dayOfWeek = 7; // Ajuste Domingo
+    let dayOfWeek = getDay(day);
+    if (dayOfWeek === 0) dayOfWeek = 7;
 
-    // A. Calcular TOTAL esperado para este día
-    const activeHabits = habits.filter(h => {
-      // 1. ¿Toca hoy según frecuencia?
+    const activeHabits = habits.filter((h) => {
       if (!h.frequency.includes(dayOfWeek)) return false;
-      // 2. ¿Ya existía el hábito en esta fecha?
       if (h.created_at) {
         const creationDate = startOfDay(new Date(h.created_at));
-        if (isBefore(day, creationDate)) return false;
+        if (isBefore(startOfDay(day), creationDate)) return false;
       }
       return true;
     });
 
     const totalExpected = activeHabits.length;
-
-    // Si no había nada que hacer ese día, no mostramos barra (o retornamos null)
     if (totalExpected === 0) return null;
 
-    // B. Calcular COMPLETADOS
-    // Filtramos los logs que coincidan con la fecha Y pertenezcan a los hábitos activos
-    const completedCount = monthLogs.filter(log => 
-      log.date === dayStr && activeHabits.some(h => h.id === log.habit_id)
+    const completedCount = habitLogs.filter(
+      (log) => log.date === dayStr && activeHabits.some((h) => h.id === log.habit_id)
     ).length;
 
-    // C. Porcentaje
     return Math.round((completedCount / totalExpected) * 100);
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage === 100) return '#9381ff'; // Violeta (Perfecto)
-    if (percentage >= 50) return '#ffd8be';   // Beige (Medio)
-    return '#ff6b6b';                         // Rojo (Bajo)
+    if (percentage === 100) return '#9381ff'; // Violeta (100%)
+    if (percentage >= 50) return '#ffd8be';   // Ámbar suave (>=50%)
+    return '#ff6b6b';                         // Rojo (<50%)
   };
 
   const nextMonth = () => setCurrentMonthView(addMonths(currentMonthView, 1));
   const prevMonth = () => setCurrentMonthView(subMonths(currentMonthView, 1));
+  const goToCurrentMonth = () => {
+    const now = new Date();
+    setCurrentMonthView(now);
+    onDateSelect(now);
+  };
 
   return (
     <div className="calendar-container">
+      {/* CABECERA DEL MES */}
       <div className="calendar-header">
-        <button onClick={prevMonth} className="nav-arrow"><ChevronLeft size={24} /></button>
-        <span className="month-title">{format(currentMonthView, 'MMMM yyyy', { locale: es })}</span>
-        <button onClick={nextMonth} className="nav-arrow"><ChevronRight size={24} /></button>
+        <button onClick={prevMonth} className="nav-arrow" aria-label="Mes anterior">
+          <ChevronLeft size={22} />
+        </button>
+
+        <div className="calendar-title-group" onClick={goToCurrentMonth} title="Ir a hoy">
+          <span className="month-title">
+            {format(currentMonthView, 'MMMM yyyy', { locale: es })}
+          </span>
+        </div>
+
+        <button onClick={nextMonth} className="nav-arrow" aria-label="Mes siguiente">
+          <ChevronRight size={22} />
+        </button>
       </div>
 
+      {/* GRILLA DE DÍAS */}
       <div className="calendar-grid">
-        {weekDays.map(day => <div key={day} className="weekday-label">{day}</div>)}
+        {weekDays.map((day) => (
+          <div key={day} className="weekday-label">
+            {day}
+          </div>
+        ))}
 
         {calendarDays.map((day) => {
           const progress = calculateDailyProgress(day);
-          
-          // FILTRADO DE EVENTOS DEL DÍA
           const dayStr = format(day, 'yyyy-MM-dd');
-          const daysEvents = calendarEvents.filter(e => e.date === dayStr);
-          const hasNote = notes.some(n => n.date === dayStr && n.content.trim() !== '');
-          // Ordenar: Primero "Todo el día", luego por hora
+
+          // Eventos de Google del día (desde DataContext)
+          const daysEvents = [...googleEvents.filter((e) => e.date === dayStr)];
           daysEvents.sort((a, b) => {
             if (a.isAllDay && !b.isAllDay) return -1;
             if (!a.isAllDay && b.isAllDay) return 1;
             return (a.time || '').localeCompare(b.time || '');
           });
-          const dayTasks = tasks.filter(t => t.date === dayStr);
-          const totalTasks = dayTasks.length;
-          const completedTasks = dayTasks.filter(t => t.completed).length;
 
-          // Limite visual: Solo mostramos los primeros 3
+          const hasNote = notes.some((n) => n.date === dayStr && n.content.trim() !== '');
+          const dayTasks = tasks.filter((t) => t.date === dayStr);
+          const totalTasks = dayTasks.length;
+          const completedTasks = dayTasks.filter((t) => t.completed).length;
+
           const MAX_VISIBLE = 3;
           const visibleEvents = daysEvents.slice(0, MAX_VISIBLE);
           const hiddenCount = daysEvents.length - MAX_VISIBLE;
 
+          const isCurrentMonth = isSameMonth(day, monthStart);
+          const isSelected = isSameDay(day, selectedDate);
+          const isDayToday = isToday(day);
+
           return (
-            <div 
-              key={day.toString()}
-              className={`day-cell 
-                ${!isSameMonth(day, monthStart) ? 'inactive' : ''} 
-                ${isSameDay(day, selectedDate) ? 'selected' : ''} 
-                ${isToday(day) ? 'today' : ''}
-              `}
+            <div
+              key={dayStr}
+              className={`day-cell ${!isCurrentMonth ? 'inactive' : ''} ${
+                isSelected ? 'selected' : ''
+              } ${isDayToday ? 'today' : ''}`}
               onClick={() => onDateSelect(day)}
             >
-              {/* HEADER DE LA CELDA (Nota izq, Número der) */}
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', width:'100%', marginBottom:'2px'}}>
-                {/* ZONA IZQUIERDA: NOTAS Y TAREAS */}
-                <div style={{display:'flex', gap:'4px', alignItems:'center'}}>
-                  {/* ICONO NOTA */}
+              {/* TOP ROW: Indicadores a la izq + Número del día a la der */}
+              <div className="day-cell-top">
+                <div className="day-indicators">
                   {hasNote && (
-                    <div style={{color: 'var(--color-primary)'}} title="Tiene notas">
-                      <FileText size={14} />
-                    </div>
+                    <span className="note-indicator" title="Tiene notas">
+                      <FileText size={12} />
+                    </span>
                   )}
-                  
-                  {/* NUEVO: CONTADOR DE TAREAS (Solo si hay tareas) */}
+
                   {totalTasks > 0 && (
-                    <span 
+                    <span
+                      className={`task-counter-badge ${
+                        completedTasks === totalTasks ? 'all-done' : ''
+                      }`}
                       title={`${completedTasks} de ${totalTasks} tareas completadas`}
-                      style={{
-                        fontSize: '0.65rem', 
-                        fontWeight: 700, 
-                        // Color verde/morado si están todas listas, sino gris
-                        color: completedTasks === totalTasks ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                        backgroundColor: 'var(--color-input-bg)',
-                        padding: '1px 4px',
-                        borderRadius: '4px'
-                      }}
                     >
                       {completedTasks}/{totalTasks}
                     </span>
                   )}
                 </div>
-                {/* NÚMERO DEL DÍA */}
+
                 <span className="day-number">{format(day, 'd')}</span>
               </div>
 
-              {/* LISTA DE EVENTOS VISUALES */}
-              <div className="events-list-container">
+              {/* VISTA DESKTOP: Barras de eventos con texto */}
+              <div className="events-list-desktop">
                 {visibleEvents.map((ev) => (
-                  <div 
-                    key={ev.id} 
-                    className={`event-bar ${!ev.isAllDay ? 'is-time' : ''}`}
-                    style={{ backgroundColor: ev.color }}
-                    title={`${ev.time ? ev.time + ' ' : ''}${ev.title}`} // Tooltip al pasar mouse
+                  <div
+                    key={ev.id}
+                    className="event-bar"
+                    style={{ backgroundColor: ev.color || 'var(--color-primary)' }}
+                    title={`${ev.time ? ev.time + ' ' : ''}${ev.title}`}
                   >
-                    {/* Si tiene hora, mostrarla pequeña */}
-                    {ev.time && <span style={{opacity: 0.9, marginRight: '3px'}}>{ev.time}</span>}
-                    {ev.title}
+                    {ev.time && <span className="event-bar-time">{ev.time}</span>}
+                    <span className="event-bar-title">{ev.title}</span>
                   </div>
                 ))}
-                
-                {/* Indicador de "Ver más" si hay muchos */}
-                {hiddenCount > 0 && (
-                  <div style={{fontSize: '0.65rem', color: 'var(--color-text-muted)', textAlign: 'center'}}>
-                    + {hiddenCount} más
-                  </div>
-                )}
+
+                {hiddenCount > 0 && <div className="events-more-label">+{hiddenCount} más</div>}
               </div>
-              
-              {/* BARRA DE PROGRESO HÁBITOS (La mantenemos abajo) */}
-              {isSameMonth(day, monthStart) && progress !== null && (
-                <div className="progress-bar-container" title={`${progress}% Hábitos`}>
-                  <div 
-                    className="progress-bar-fill" 
-                    style={{ width: `${progress}%`, backgroundColor: getProgressColor(progress)}} 
+
+              {/* VISTA MÓVIL: Puntos de colores limpios para no romper el ancho de 7 columnas */}
+              {daysEvents.length > 0 && (
+                <div className="events-dots-mobile">
+                  {daysEvents.slice(0, 4).map((ev) => (
+                    <span
+                      key={ev.id}
+                      className="event-dot"
+                      style={{ backgroundColor: ev.color || 'var(--color-primary)' }}
+                    />
+                  ))}
+                  {daysEvents.length > 4 && <span className="event-dot-plus">+</span>}
+                </div>
+              )}
+
+              {/* BARRA DE PROGRESO DE HÁBITOS ABAJO */}
+              {isCurrentMonth && progress !== null && (
+                <div className="progress-bar-container" title={`${progress}% Rutinas`}>
+                  <div
+                    className="progress-bar-fill"
+                    style={{
+                      width: `${progress}%`,
+                      backgroundColor: getProgressColor(progress),
+                    }}
                   />
                 </div>
               )}

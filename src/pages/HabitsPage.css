@@ -1,0 +1,170 @@
+/* src/pages/HabitsPage.css */
+.habits-page-wrapper {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.habits-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.4rem;
+  box-shadow: var(--shadow-card);
+}
+
+.habits-title-block {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.habits-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  transition: all 0.15s ease;
+}
+
+.habits-back-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.habits-title-block h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.habits-title-block p {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 2px 0 0 0;
+}
+
+.habits-new-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 15px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: transform 0.12s ease, opacity 0.15s ease;
+}
+
+.habits-new-primary-btn:active {
+  transform: scale(0.97);
+}
+
+/* Tarjeta de creación */
+.habit-create-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.habit-create-top {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+}
+
+.habit-create-top input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  color: var(--color-text-main);
+}
+
+.habit-create-freq-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.freq-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.freq-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: 2px;
+}
+
+.freq-preset-pill {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.freq-preset-pill.active {
+  background-color: rgba(147, 129, 255, 0.18);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.habit-create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.habits-list-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.habits-empty-card {
+  background-color: var(--color-white);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+}

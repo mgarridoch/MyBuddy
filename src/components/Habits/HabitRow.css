@@ -1,118 +1,177 @@
 /* src/components/Habits/HabitRow.css */
 .habit-card {
   background-color: var(--color-white);
-  border: 1px solid var(--color-secondary);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 1rem;
+  padding: 0.85rem 1.15rem;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transition: transform 0.2s;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease;
 }
 
 .habit-card:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-secondary);
 }
 
 .habit-header {
+  flex: 1;
+  min-width: 0;
+}
+
+.habit-title-group {
   display: flex;
-  align-items: center;
-  /* FIX: Esto permite que el texto ocupe espacio pero se rinda si no hay */
-  flex: 1; 
-  min-width: 0; 
-  margin-right: 10px;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
 }
 
 .habit-name {
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   font-weight: 600;
   color: var(--color-text-main);
-  
-  /* FIX: Cortar texto con (...) si es muy largo */
-  white-space: nowrap; 
-  overflow: hidden; 
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
-  display: block;
-  width: 100%;
 }
 
-/* CONTENEDOR DE DÍAS */
-.days-grid {
+.habit-freq-badge {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.habit-inline-edit {
   display: flex;
-  gap: 0.5rem;
-  justify-content: flex-start;
-  /* FIX: Evitar que los días se aplasten si el nombre es largo */
-  flex-shrink: 0; 
-  flex-wrap: wrap; 
+  align-items: center;
+  gap: 6px;
 }
 
-.day-toggle {
-  width: 36px;
-  height: 36px;
+.habit-inline-edit input {
+  flex: 1;
+  max-width: 260px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-input-bg);
+  color: var(--color-text-main);
+  font-size: 0.92rem;
+  outline: none;
+}
+
+.inline-icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-secondary);
-  border-radius: var(--radius-sm);
-  background-color: transparent;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   color: var(--color-text-muted);
-  font-weight: 600;
-  font-size: 0.8rem;
+  background-color: var(--color-input-bg);
+}
+
+.inline-icon-btn.save {
+  color: var(--color-primary);
+}
+
+.habit-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* Píldoras de días L M X J V S D */
+.days-grid {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.day-toggle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-muted);
+  font-weight: 700;
+  font-size: 0.76rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .day-toggle.active {
   background-color: var(--color-primary);
-  color: white;
+  color: #ffffff;
   border-color: var(--color-primary);
+  box-shadow: 0 2px 6px rgba(147, 129, 255, 0.28);
 }
 
 .day-toggle:hover:not(.active) {
-  background-color: var(--color-bg);
+  border-color: var(--color-secondary);
+  color: var(--color-text-main);
 }
 
-/* BOTONES DE ACCIÓN */
 .actions-container {
   display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  border-top: 1px solid #eee;
-  padding-top: 0.8rem;
-  /* FIX: Evitar que los botones se aplasten */
-  flex-shrink: 0; 
+  align-items: center;
+  gap: 4px;
 }
 
-.btn-action {
-  padding: 0.4rem 1rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  border: 1px solid transparent;
-  cursor: pointer;
-  background-color: transparent;
+.habit-icon-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  transition: all 0.15s ease;
 }
 
-.btn-edit {
-  border-color: var(--color-primary);
+.habit-icon-action:hover {
+  background-color: var(--color-input-bg);
   color: var(--color-primary);
 }
-.btn-edit:hover { background-color: #f0ebff; }
 
-.btn-delete {
-  border-color: var(--color-danger);
+.habit-icon-action.danger:hover {
+  background-color: rgba(255, 107, 107, 0.12);
   color: var(--color-danger);
 }
-.btn-delete:hover { background-color: #fff0f0; }
 
-/* Responsive: Escritorio */
-@media (min-width: 900px) {
+/* =========================================================
+   RESPONSIVE MÓVIL (< 680px)
+   ========================================================= */
+@media (max-width: 680px) {
   .habit-card {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.9rem;
   }
-  .habit-header { margin-bottom: 0; }
-  .days-grid { margin: 0 1rem; }
-  .actions-container { border-top: none; padding-top: 0; }
+
+  .habit-controls-right {
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 0.55rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .days-grid {
+    flex: 1;
+    justify-content: space-between;
+    max-width: 260px;
+  }
+
+  .day-toggle {
+    width: 33px;
+    height: 33px;
+  }
 }
