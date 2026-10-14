@@ -1,4 +1,5 @@
 import React from 'react';
+import { Capacitor } from '@capacitor/core';
 import { supabase } from '../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -7,7 +8,6 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { session } = useAuth();
 
-  // Si ya está logueado, lo mandamos al Dashboard
   React.useEffect(() => {
     if (session) {
       navigate('/');
@@ -16,17 +16,20 @@ export const LoginPage: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      // Si estamos en la App de Android, redirigimos al esquema nativo mybuddy://
+      const redirectUrl = Capacitor.isNativePlatform()
+        ? 'mybuddy://auth-callback'
+        : window.location.origin;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
-          // AGREGAMOS ESTO: Pedimos acceso de solo lectura al calendario
+          redirectTo: redirectUrl,
           scopes: 'https://www.googleapis.com/auth/calendar',
           queryParams: {
-            // Esto fuerza a Google a enviar un "provider_token" nuevo
             access_type: 'offline',
           },
-        }
+        },
       });
       if (error) throw error;
     } catch (error) {
@@ -36,29 +39,36 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'var(--color-bg)',
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '3rem',
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-card)',
-        textAlign: 'center',
-        maxWidth: '400px',
-        width: '100%'
-      }}>
-        <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>Bienvenido a MyBuddy</h1>
-        <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>
-          Organiza tu vida, hábitos y tareas en un solo lugar.
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'var(--color-bg)',
+        padding: '20px',
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: 'var(--color-white)',
+          border: '1px solid var(--color-border)',
+          padding: '2.5rem 2rem',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-card)',
+          textAlign: 'center',
+          maxWidth: '400px',
+          width: '100%',
+        }}
+      >
+        <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
+          Bienvenido a MyBuddy
+        </h1>
+        <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem', fontSize: '0.92rem' }}>
+          Organiza tu vida, hábitos, gimnasio y tareas en un solo lugar.
         </p>
 
-        <button 
+        <button
           onClick={handleGoogleLogin}
           style={{
             display: 'flex',
@@ -67,18 +77,16 @@ export const LoginPage: React.FC = () => {
             gap: '10px',
             width: '100%',
             padding: '12px',
-            border: '1px solid #ddd',
+            border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
-            backgroundColor: 'white',
-            fontSize: '1rem',
-            fontWeight: 500,
+            backgroundColor: 'var(--color-input-bg)',
+            color: 'var(--color-text-main)',
+            fontSize: '0.95rem',
+            fontWeight: 600,
             cursor: 'pointer',
-            transition: 'background 0.2s'
+            marginBottom: '1.25rem',
           }}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
         >
-          {/* Icono de Google SVG */}
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -99,9 +107,13 @@ export const LoginPage: React.FC = () => {
           </svg>
           Iniciar sesión con Google
         </button>
-        <a style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }} href="/privacy">
-        Información de privacidad
-      </a>
+
+        <a
+          style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', textDecoration: 'none' }}
+          href="/privacy"
+        >
+          Información de privacidad
+        </a>
       </div>
     </div>
   );

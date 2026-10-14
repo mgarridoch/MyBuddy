@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../services/supabase';
+import { App as CapApp } from '@capacitor/app';
 
 const GOOGLE_TOKEN_KEY = 'mybuddy_google_token';
 const GOOGLE_TOKEN_EXPIRY_KEY = 'mybuddy_google_token_expiry';
@@ -71,10 +72,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       syncGoogleToken(newSession);
       setLoading(false);
     });
+    // Listener para atrapar el login cuando regresa por Deep Link (mybuddy://auth-callback#access_token=...)
+    const appUrlListener = CapApp.addListener('appUrlOpen', async ({ url }) => {
+      if (url.includes('#')) {
+        const hash = url.split('#')[1];
+        const params = new URLSearchParams(hash);
+        const access_token = params.get('access_token');
+        const refresh_token = params.get('refresh_token');
+        const provider_token = params.get('provider_token');
 
+        if (provider_token) {
+          const expiryTime = Date.now() + 55 * 60 * 1000;
+          localStorage.setItem(GOOGLE_TOKEN_KEY, provider_token);
+          localStorage.setItem(GOOGLE_TOKEN_EXPIRY_KEY, expiryTime.toString());
+          setGoogleToken(provider_token);
+        }
+
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token });
+        }
+      }
+    });
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      appUrlListener.then(l => l.remove());
     };
   }, []);
 
