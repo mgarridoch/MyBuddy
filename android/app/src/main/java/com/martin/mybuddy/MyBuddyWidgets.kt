@@ -18,18 +18,26 @@ object WidgetDataHelper {
     fun getSnapshot(context: Context): JSONObject? {
         return try {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            val raw = prefs.getString(SNAPSHOT_KEY, null) ?: return null
-            JSONObject(raw)
+            val raw = prefs.getString(SNAPSHOT_KEY, null)
+            if (raw != null) {
+                return JSONObject(raw)
+            }
+            // Fallback: buscar en todas las claves de CapacitorStorage por si tiene prefijo
+            for ((_, value) in prefs.all) {
+                if (value is String && value.contains("daySummary")) {
+                    return JSONObject(value)
+                }
+            }
+            null
         } catch (e: Exception) {
             null
         }
     }
 
-    // Abre la app en una ruta específica usando el Deep Link mybuddy://navigate?path=/sports
     fun openRoutePendingIntent(context: Context, path: String, requestCode: Int): PendingIntent {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mybuddy://auth-callback?path=$path")).apply {
-            setPackage(context.packageName)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            setClass(context, MainActivity::class.java)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         return PendingIntent.getActivity(
             context,
@@ -39,9 +47,10 @@ object WidgetDataHelper {
         )
     }
 
-    fun refreshPendingIntent(context: Context, requestCode: Int): PendingIntent {
-        val intent = Intent(ACTION_REFRESH_WIDGETS).apply {
-            setPackage(context.packageName)
+    fun refreshPendingIntent(context: Context, providerClass: Class<*>, requestCode: Int): PendingIntent {
+        // Intent explícito directo a la clase del Widget (Android 14 no lo bloquea)
+        val intent = Intent(context, providerClass).apply {
+            action = ACTION_REFRESH_WIDGETS
         }
         return PendingIntent.getBroadcast(
             context,
@@ -65,9 +74,6 @@ object WidgetDataHelper {
     }
 }
 
-/**
- * WIDGET 1: MI DÍA (Rutinas + Tareas de Hoy) -> Abre "/"
- */
 class MyBuddyDayWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
@@ -104,8 +110,8 @@ class MyBuddyDayWidget : AppWidgetProvider() {
         }
 
         val bodyText = when {
-            snapshot == null -> "Toca ↻ o abre MyBuddy para sincronizar..."
-            lines.isEmpty() -> "✨ Todo al día por hoy"
+            snapshot == null -> "Sin datos aún (abre la app y vuelve al inicio)"
+            lines.isEmpty() -> "✨ No tienes rutinas ni tareas pendientes hoy"
             else -> lines.joinToString("\n")
         }
 
@@ -115,22 +121,18 @@ class MyBuddyDayWidget : AppWidgetProvider() {
             views.setProgressBar(R.id.day_progress_bar, 100, pct, false)
             views.setTextViewText(R.id.day_items_text, bodyText)
 
-            views.setOnClickPendingIntent(
-                R.id.widget_root,
-                WidgetDataHelper.openRoutePendingIntent(context, "/", 101)
-            )
+            val openHome = WidgetDataHelper.openRoutePendingIntent(context, "/", 101)
+            views.setOnClickPendingIntent(R.id.widget_root, openHome)
+            views.setOnClickPendingIntent(R.id.day_items_text, openHome)
             views.setOnClickPendingIntent(
                 R.id.widget_refresh_btn,
-                WidgetDataHelper.refreshPendingIntent(context, 901)
+                WidgetDataHelper.refreshPendingIntent(context, MyBuddyDayWidget::class.java, 901)
             )
             appWidgetManager.updateAppWidget(widgetId, views)
         }
     }
 }
 
-/**
- * WIDGET 2: AGENDA DE HOY (Google Calendar) -> Abre "/"
- */
 class MyBuddyAgendaWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
@@ -158,24 +160,25 @@ class MyBuddyAgendaWidget : AppWidgetProvider() {
             }
         }
 
-        val bodyText = if (lines.isEmpty()) "No tienes eventos programados hoy." else lines.joinToString("\n")
+        val bodyText = when {
+            snapshot == null -> "Abre MyBuddy para sincronizar agenda"
+            lines.isEmpty() -> "No hay eventos en Google Calendar para hoy ($dateStr)"
+            else -> lines.joinToString("\n")
+        }
 
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_agenda)
             views.setTextViewText(R.id.agenda_date_label, dateStr)
             views.setTextViewText(R.id.agenda_events_text, bodyText)
-            views.setOnClickPendingIntent(
-                R.id.widget_root,
-                WidgetDataHelper.openRoutePendingIntent(context, "/", 102)
-            )
+
+            val openAgenda = WidgetDataHelper.openRoutePendingIntent(context, "/", 102)
+            views.setOnClickPendingIntent(R.id.widget_root, openAgenda)
+            views.setOnClickPendingIntent(R.id.agenda_events_text, openAgenda)
             appWidgetManager.updateAppWidget(widgetId, views)
         }
     }
 }
 
-/**
- * WIDGET 3: GYM & RACHA -> Abre directamente "/sports"
- */
 class MyBuddyGymWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
@@ -197,7 +200,7 @@ class MyBuddyGymWidget : AppWidgetProvider() {
         val statusText = if (isTrainingNow) {
             "⚡ En curso: $activeTitle"
         } else {
-            "Rutina lista: $lastRoutine"
+            "Próxima: $lastRoutine"
         }
 
         val btnText = if (isTrainingNow) {
@@ -207,16 +210,18 @@ class MyBuddyGymWidget : AppWidgetProvider() {
         }
 
         val targetPath = if (isTrainingNow) "/workout-session" else "/sports"
+        val openGymIntent = WidgetDataHelper.openRoutePendingIntent(context, targetPath, 103)
 
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_gym)
             views.setTextViewText(R.id.gym_month_count, "🔥 $count este mes")
             views.setTextViewText(R.id.gym_status_text, statusText)
             views.setTextViewText(R.id.gym_action_btn, btnText)
-            views.setOnClickPendingIntent(
-                R.id.widget_root,
-                WidgetDataHelper.openRoutePendingIntent(context, targetPath, 103)
-            )
+
+            // Asignamos el intent tanto al contenedor como al botón violeta explícitamente
+            views.setOnClickPendingIntent(R.id.widget_root, openGymIntent)
+            views.setOnClickPendingIntent(R.id.gym_action_btn, openGymIntent)
+            views.setOnClickPendingIntent(R.id.gym_status_text, openGymIntent)
             appWidgetManager.updateAppWidget(widgetId, views)
         }
     }

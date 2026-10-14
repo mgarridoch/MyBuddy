@@ -4,12 +4,23 @@ import android.content.Intent;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
+
     @Override
     public void onPause() {
         super.onPause();
-        // Le avisa a los widgets que se actualicen apenas minimizas o sales de la app
-        Intent intent = new Intent("com.martin.mybuddy.ACTION_REFRESH_WIDGETS");
-        intent.setPackage(getPackageName());
-        sendBroadcast(intent);
+        // Actualiza los 3 widgets directamente sin depender de broadcasts bloqueados
+        WidgetDataHelper.INSTANCE.updateAllWidgets(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        WidgetDataHelper.INSTANCE.updateAllWidgets(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
     }
 }

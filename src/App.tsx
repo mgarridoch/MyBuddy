@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './pages/Dashboard';
@@ -14,13 +15,37 @@ import { WorkoutSessionPage } from './pages/Sports/WorkoutSessionPage';
 import { WorkoutProvider } from './context/WorkoutContext';
 import { StatsPage } from './pages/Sports/StatsPage';
 import { TasksPage } from './pages/Tasks/TasksPage';
+import { App as CapApp } from '@capacitor/app';
+
+
 
 function App() {
+  // Escucha cuando tocas un Widget y navega con React Router a /sports o /
+  const WidgetDeepLinkHandler = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      const sub = CapApp.addListener('appUrlOpen', ({ url }) => {
+        if (url.includes('?path=')) {
+          const path = new URL(url).searchParams.get('path');
+          if (path) {
+            navigate(path);
+          }
+        }
+      });
+      return () => {
+        sub.then((s) => s.remove());
+      };
+    }, [navigate]);
+
+    return null;
+  };
   return (
     <AuthProvider>
       <DataProvider>
         <WorkoutProvider>
           <BrowserRouter>
+            <WidgetDeepLinkHandler />
             <Routes>
               {/* Ruta pública */}
               <Route path="/login" element={<LoginPage />} />
