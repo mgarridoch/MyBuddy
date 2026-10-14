@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'MyBuddy',
   webDir: 'dist',
   server: {
-    url: 'https://TU-URL-DE-VERCEL.vercel.app', // <-- Pon aquí tu URL real de Vercel
+    url: 'https://my-buddy-seven.vercel.app', // <-- Pon aquí tu URL real de Vercel
     cleartext: true,
   },
   // Truco clave: Google bloquea el login dentro de WebViews si detecta "; wv" en el User-Agent.
