@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/preferences": "^8.0.1",
     "@supabase/supabase-js": "^2.93.3",
     "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
@@ -21,6 +25,8 @@
     "recharts": "^3.7.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

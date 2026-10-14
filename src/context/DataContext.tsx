@@ -7,6 +7,7 @@ import { getGoogleEventsForMonth } from '../services/googleService';
 import { getAppSettings, saveAppSettings } from '../services/settingsService';
 import type { Habit, Task, DayNote, AppSettings } from '../types';
 import { supabase } from '../services/supabase';
+import { syncWidgetsData } from '../services/widgetBridge';
 
 const THEME_CACHE_KEY = 'mybuddy_theme_cache';
 
@@ -161,6 +162,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       document.body.classList.remove('dark-mode');
     }
   }, [appSettings.theme]);
+
+  // Sincronizar automáticamente con los Widgets de Android cuando cambian los datos
+  useEffect(() => {
+    if (!user?.id) return;
+    syncWidgetsData({
+      habits,
+      habitLogs,
+      tasks,
+      googleEvents,
+      accessToken: session?.access_token || null,
+      userId: user.id,
+    });
+  }, [habits, habitLogs, tasks, googleEvents, session?.access_token, user?.id]);
 
   const updateAppSettings = async (newSettings: AppSettings) => {
     setAppSettingsState(newSettings);

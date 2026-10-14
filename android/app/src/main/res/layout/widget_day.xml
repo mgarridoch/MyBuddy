@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <!-- Cabecera -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/day_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MyBuddy · Hoy"
+            android:textColor="#9381FF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/day_progress_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="0/0"
+            android:textColor="#E6E6E6"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_refresh_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="↻"
+            android:textColor="#A0A0B0"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Barra de progreso de rutinas -->
+    <ProgressBar
+        android:id="@+id/day_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
+        android:max="100"
+        android:progress="0"
+        android:progressBackgroundTint="#2D2D44"
+        android:progressTint="#9381FF" />
+
+    <!-- Lista de Rutinas y Tareas -->
+    <TextView
+        android:id="@+id/day_items_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="4dp"
+        android:text="Abre MyBuddy para sincronizar tu día..."
+        android:textColor="#E6E6E6"
+        android:textSize="12.5sp" />
+
+</LinearLayout>
