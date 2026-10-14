@@ -5,9 +5,9 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_bg"
     android:orientation="vertical"
-    android:padding="14dp">
+    android:padding="10dp">
 
-    <!-- Cabecera -->
+    <!-- Cabecera compacta -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,40 +19,42 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="MyBuddy · Hoy"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Hoy"
             android:textColor="#9381FF"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/day_progress_badge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="6dp"
             android:text="0/0"
             android:textColor="#E6E6E6"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/widget_refresh_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
+            android:paddingHorizontal="2dp"
             android:text="↻"
             android:textColor="#A0A0B0"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Barra de progreso de rutinas -->
+    <!-- Barra de progreso -->
     <ProgressBar
         android:id="@+id/day_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="6dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="6dp"
         android:max="100"
         android:progress="0"
         android:progressBackgroundTint="#2D2D44"
@@ -63,9 +65,11 @@
         android:id="@+id/day_items_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:lineSpacingExtra="4dp"
-        android:text="Abre MyBuddy para sincronizar tu día..."
+        android:ellipsize="end"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="6"
+        android:text="Sincronizando..."
         android:textColor="#E6E6E6"
-        android:textSize="12.5sp" />
+        android:textSize="11.5sp" />
 
 </LinearLayout>

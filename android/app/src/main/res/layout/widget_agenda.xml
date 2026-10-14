@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_bg"
     android:orientation="vertical"
-    android:padding="14dp">
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,9 +17,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="📅 Agenda de Hoy"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="📅 Agenda"
             android:textColor="#9381FF"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -27,17 +29,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#A0A0B0"
-            android:textSize="11sp" />
+            android:textSize="10sp" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/agenda_events_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:lineSpacingExtra="5dp"
-        android:text="Sin eventos para hoy"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:lineSpacingExtra="3dp"
+        android:maxLines="5"
+        android:text="Sin eventos hoy"
         android:textColor="#E6E6E6"
-        android:textSize="12.5sp" />
+        android:textSize="11.5sp" />
 
 </LinearLayout>
