@@ -74,6 +74,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     // Listener para atrapar el login cuando regresa por Deep Link (mybuddy://auth-callback#access_token=...)
     const appUrlListener = CapApp.addListener('appUrlOpen', async ({ url }) => {
+      if (url.includes('?path=')) {
+        const pathParam = new URL(url).searchParams.get('path');
+        if (pathParam && window.location.pathname !== pathParam) {
+          window.history.pushState({}, '', pathParam);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }
+      }
       if (url.includes('#')) {
         const hash = url.split('#')[1];
         const params = new URLSearchParams(hash);

@@ -60,6 +60,7 @@
             android:label="MyBuddy · Agenda">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.martin.mybuddy.ACTION_REFRESH_WIDGETS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -73,6 +74,7 @@
             android:label="MyBuddy · Gym">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.martin.mybuddy.ACTION_REFRESH_WIDGETS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

@@ -59,7 +59,7 @@ export const SportsHub: React.FC = () => {
 
     loadHubData();
   }, []);
-
+  
   const handleStartRoutine = async (routine: Routine) => {
     if (startingRoutineId !== null) return;
     setStartingRoutineId(routine.id);
