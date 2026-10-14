@@ -1,283 +1,273 @@
-/* CONTAINER GENERAL */
-.exercises-container {
-  padding: 1.5rem;
-  /* Usamos la variable global para que coincida con el tema */
-  background-color: var(--color-bg); 
-  min-height: 100vh;
-  color: var(--color-text-main);
-  transition: background-color 0.3s ease;
-  max-width: 1000px; 
+/* src/pages/Sports/ExercisesPage.css */
+
+.exercises-page-wrapper {
+  max-width: 1020px;
   margin: 0 auto;
-  box-shadow: 0 0 40px rgba(0,0,0,0.05);
-}
-
-.page-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.exercises-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.search-input-box {
+  display: flex;
   align-items: center;
-  margin-bottom: 2rem;
-}
-
-.page-title {
-  color: var(--color-primary);
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-/* BARRA DE BÚSQUEDA */
-.search-container {
-  position: relative;
-  max-width: 500px;
-  margin-bottom: 2rem;
-}
-
-.search-bar {
-  width: 100%;
-  padding: 12px 15px 12px 45px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-white); /* Variable de tarjeta */
-  color: var(--color-text-main);
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-.search-bar:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(147, 129, 255, 0.1);
-}
-
-.search-icon {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-text-muted);
-}
-
-/* GRILLA MÁS DENSA (Tarjetas más chicas) */
-.exercises-grid {
-  display: grid;
-  /* Ancho mínimo más pequeño para que quepan más */
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-  gap: 1rem;
-}
-
-/* TARJETA COMPACTA (Sin video) */
-.exercise-card {
+  gap: 0.65rem;
   background-color: var(--color-white);
-  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
-  padding: 1rem; /* Padding interno uniforme */
-  cursor: pointer;
-  transition: all 0.2s;
+  border-radius: var(--radius-md);
+  padding: 0.7rem 1rem;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.2s ease;
+}
+
+.search-input-box:focus-within {
+  border-color: var(--color-primary);
+}
+
+.search-icon-inline {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.search-input-box input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  color: var(--color-text-main);
+}
+
+/* Tira horizontal de filtros por Tag */
+.exercise-tags-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.exercise-tags-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.tag-filter-chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: all 0.15s ease;
+}
+
+.tag-filter-chip.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Grilla de tarjetas de ejercicios */
+.exercises-modern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 0.85rem;
+}
+
+.exercise-modern-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%; /* Para que todas tengan misma altura en la fila */
-  min-height: 100px;
-}
-
-.exercise-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--color-primary);
+  gap: 0.85rem;
+  cursor: pointer;
   box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
-.exercise-media {
-  height: 140px; /* Un poco más alto */
-  background-color: var(--color-input-bg);
+.exercise-modern-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.ex-card-top {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-bottom: 1px solid var(--color-border);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
 }
 
-.exercise-media video, .exercise-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.exercise-info {
-  padding: 1rem;
-}
-
-/* El nombre ahora es el protagonista */
-.exercise-name {
-  font-size: 1.1rem;
+.ex-card-title {
+  font-size: 0.98rem;
   font-weight: 700;
   color: var(--color-text-main);
-  margin-bottom: 0.5rem;
+  margin: 0;
   line-height: 1.3;
-  /* Permitir 2 líneas antes de cortar */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: normal; 
 }
 
-.exercise-weight {
-  font-size: 0.85rem;
-  color: var(--color-primary);
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.exercise-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.tag-badge {
-  font-size: 0.7rem;
+.ex-weight-pill {
+  font-size: 0.76rem;
+  font-weight: 700;
   padding: 3px 8px;
-  background-color: var(--color-bg);
-  color: var(--color-text-muted);
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
-  font-weight: 500;
-}
-
-/* --- ESTILOS DEL MODAL --- */
-
-.form-group {
-  margin-bottom: 1.2rem;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-text-main);
-  margin-bottom: 0.6rem;
-}
-
-.form-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border-radius: 6px;
   background-color: var(--color-input-bg);
-  color: var(--color-text-main);
-  font-size: 1rem;
-  transition: border 0.2s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-/* DROPZONE DE ARCHIVOS (ARREGLADO) */
-.file-upload-box {
-  display: flex; /* Flexbox para centrar contenido */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  
-  border: 2px dashed var(--color-secondary);
-  border-radius: var(--radius-md);
-  padding: 2rem;
-  text-align: center;
   color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all 0.2s;
-  background-color: rgba(147, 129, 255, 0.05);
-  width: 100%; /* Ocupar todo el ancho disponible */
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.file-upload-box:hover {
-  background-color: rgba(147, 129, 255, 0.1);
-  border-color: var(--color-primary);
+.ex-weight-pill.has-weight {
+  background-color: rgba(147, 129, 255, 0.15);
   color: var(--color-primary);
 }
 
-/* Botón principal del modal */
-.modal-action-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--color-primary);
-  color: white;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
+.ex-card-bottom {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ex-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ex-mini-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.ex-indicators {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-text-muted);
+}
+
+.ex-media-badge.video {
+  color: var(--color-primary);
+}
+
+/* Dropzone de archivos */
+.file-upload-box {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: opacity 0.2s;
-}
-.modal-action-btn:hover {
-  opacity: 0.9;
-}
-
-.exercise-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: 10px;
-}
-
-.exercise-weight-badge {
+  border: 1.5px dashed var(--color-secondary);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background-color: var(--color-input-bg);
   font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  background-color: rgba(147, 129, 255, 0.1);
-  padding: 4px 8px;
-  border-radius: 6px;
+  transition: border-color 0.15s ease;
 }
 
-/* --- ESTILOS DEL MODAL DE DETALLE --- */
+.file-upload-box:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
 
+/* Video y Tabla de Historial en el Modal */
 .detail-video-container {
   width: 100%;
-  height: 200px; /* Altura fija para el video en el modal */
+  max-height: 210px;
+  aspect-ratio: 16 / 9;
   background-color: #000;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
-.detail-video-container video, .detail-video-container img {
+.detail-video-container video {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Que se vea entero */
+  object-fit: contain;
 }
 
-/* TABLA DE HISTORIAL */
+.pr-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: rgba(255, 159, 67, 0.16);
+  color: #ff9f43;
+}
+
+.history-section-card {
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-header-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.history-empty-text {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.history-scroll-box {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
 .history-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 }
 
 .history-table th {
   text-align: left;
-  padding: 8px;
+  padding: 5px 6px;
   color: var(--color-text-muted);
   border-bottom: 1px solid var(--color-border);
-  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
 }
 
 .history-table td {
-  padding: 8px;
+  padding: 6px;
   color: var(--color-text-main);
   border-bottom: 1px solid var(--color-border);
-}
-
-.history-section {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
 }

@@ -1,5 +1,13 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 interface Props {
   data: { date: string; value: number }[];
@@ -7,29 +15,74 @@ interface Props {
   unit?: string;
 }
 
-export const WeightChart: React.FC<Props> = ({ data, color = "#9381ff", unit = "kg" }) => {
-  if (data.length === 0) return <div style={{textAlign:'center', padding:'20px', color:'#888'}}>Sin datos aún</div>;
+export const WeightChart: React.FC<Props> = ({
+  data,
+  color = '#9381ff',
+  unit = 'kg',
+}) => {
+  if (!data || data.length === 0) {
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '3rem 1rem',
+          color: 'var(--color-text-muted)',
+          fontSize: '0.88rem',
+        }}
+      >
+        Sin registros suficientes para graficar aún.
+      </div>
+    );
+  }
+
+  const gradientId = `chartGrad-${color.replace('#', '')}`;
 
   return (
-    <div style={{ width: '100%', height: 300 }}>
+    <div style={{ width: '100%', height: 270 }}>
       <ResponsiveContainer>
-        <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-          <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-          <XAxis dataKey="date" style={{fontSize: '0.8rem'}} tick={{fill: '#888'}} />
-          <YAxis domain={['auto', 'auto']} style={{fontSize: '0.8rem'}} tick={{fill: '#888'}} />
-          <Tooltip 
-            contentStyle={{backgroundColor: 'var(--color-white)', borderRadius: '8px', border: '1px solid var(--color-border)'}}
-            formatter={(value: any) => [`${value} ${unit}`, 'Peso']}
+        <AreaChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: -16 }}>
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={color} stopOpacity={0.35} />
+              <stop offset="95%" stopColor={color} stopOpacity={0.0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke="rgba(147, 129, 255, 0.12)" strokeDasharray="4 4" vertical={false} />
+          <XAxis
+            dataKey="date"
+            style={{ fontSize: '0.75rem' }}
+            tick={{ fill: 'var(--color-text-muted)' }}
+            axisLine={false}
+            tickLine={false}
           />
-          <Line 
-            type="monotone" 
-            dataKey="value" 
-            stroke={color} 
+          <YAxis
+            domain={['dataMin - 1', 'dataMax + 1']}
+            style={{ fontSize: '0.75rem' }}
+            tick={{ fill: 'var(--color-text-muted)' }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: 'var(--color-white)',
+              borderRadius: '10px',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text-main)',
+              fontSize: '0.85rem',
+            }}
+            formatter={(value: any) => [`${value} ${unit}`, 'Registro']}
+          />
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke={color}
             strokeWidth={3}
-            dot={{r: 4, fill: color}}
-            activeDot={{r: 6}} 
+            fillOpacity={1}
+            fill={`url(#${gradientId})`}
+            dot={{ r: 4, fill: color, strokeWidth: 0 }}
+            activeDot={{ r: 6 }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

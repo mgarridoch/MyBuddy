@@ -1,221 +1,346 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Save, Search } from 'lucide-react';
+import {
+  X,
+  Plus,
+  Trash2,
+  Save,
+  Search,
+  ArrowUp,
+  ArrowDown,
+  Dumbbell,
+  Sparkles,
+} from 'lucide-react';
 import type { Exercise, Routine, RoutineExercise } from '../../types';
-import { getExercises, createRoutine, addExerciseToRoutine, getRoutineDetails, updateRoutine, clearRoutineExercises } from '../../services/sportService';
+import {
+  getExercises,
+  createExercise,
+  createRoutine,
+  addExerciseToRoutine,
+  getRoutineDetails,
+  updateRoutine,
+  clearRoutineExercises,
+} from '../../services/sportService';
 import '../../pages/Sports/RoutinesPage.css';
 
 interface Props {
   isOpen: boolean;
-  routineToEdit?: Routine | null; // <--- NUEVO
+  routineToEdit?: Routine | null;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const RoutineBuilderModal: React.FC<Props> = ({ isOpen, routineToEdit, onClose, onSuccess }) => {
-  // Estado Rutina
+export const RoutineBuilderModal: React.FC<Props> = ({
+  isOpen,
+  routineToEdit,
+  onClose,
+  onSuccess,
+}) => {
   const [routineName, setRoutineName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState<Partial<RoutineExercise>[]>([]);
-  
-  // Estado Biblioteca (para elegir)
+
   const [library, setLibrary] = useState<Exercise[]>([]);
   const [search, setSearch] = useState('');
-  const [showPicker, setShowPicker] = useState(false); // Toggle para mostrar lista de elección
-
+  const [showMobilePicker, setShowMobilePicker] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [creatingQuickEx, setCreatingQuickEx] = useState(false);
 
-  // Cargar biblioteca al abrir
   useEffect(() => {
-    if (isOpen) {
-      // 1. Cargar biblioteca siempre
-      getExercises().then(setLibrary);
+    if (!isOpen) return;
+    getExercises().then(setLibrary);
+    setSearch('');
+    setShowMobilePicker(false);
 
-      // 2. Si estamos EDITANDO, cargar datos
-      if (routineToEdit) {
-        setRoutineName(routineToEdit.name);
-        // Traer los ejercicios de esta rutina
-        getRoutineDetails(routineToEdit.id).then(details => {
-          setSelectedExercises(details);
-        });
-      } else {
-        // Si estamos CREANDO, limpiar
-        setRoutineName('');
-        setSelectedExercises([]);
-      }
+    if (routineToEdit) {
+      setRoutineName(routineToEdit.name);
+      getRoutineDetails(routineToEdit.id).then((details) => {
+        setSelectedExercises(details);
+      });
+    } else {
+      setRoutineName('');
+      setSelectedExercises([]);
     }
   }, [isOpen, routineToEdit]);
 
-  // Agregar ejercicio a la lista temporal
   const handleAddExercise = (ex: Exercise) => {
-    setSelectedExercises([
-      ...selectedExercises,
+    setSelectedExercises((prev) => [
+      ...prev,
       {
         exercise_id: ex.id,
-        exercise: ex, // Guardamos objeto completo para mostrar nombre
-        sets: 3, // Default
+        exercise: ex,
+        sets: 3,
         reps: '10',
-        order_index: selectedExercises.length
-      }
+        order_index: prev.length,
+      },
     ]);
-    setShowPicker(false);
-    setSearch('');
+    setShowMobilePicker(false);
   };
 
-  // Remover de lista temporal
+  // Crear ejercicio directamente si lo buscó y no existía en la biblioteca
+  const handleQuickCreateExercise = async () => {
+    const cleanName = search.trim();
+    if (!cleanName || creatingQuickEx) return;
+    setCreatingQuickEx(true);
+    try {
+      const created = await createExercise({
+        name: cleanName,
+        last_weight: 0,
+        tags: [],
+      });
+      setLibrary((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+      handleAddExercise(created);
+      setSearch('');
+    } catch (e) {
+      alert('Error creando ejercicio rápido');
+    } finally {
+      setCreatingQuickEx(false);
+    }
+  };
+
   const handleRemove = (index: number) => {
-    const newList = [...selectedExercises];
-    newList.splice(index, 1);
-    setSelectedExercises(newList);
+    setSelectedExercises((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Actualizar Sets/Reps
-  const handleUpdateRow = (index: number, field: 'sets'|'reps', value: string) => {
-    const newList = [...selectedExercises];
-    // @ts-ignore
-    newList[index][field] = value;
-    setSelectedExercises(newList);
+  const handleMove = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= selectedExercises.length) return;
+    const copy = [...selectedExercises];
+    const [moved] = copy.splice(index, 1);
+    copy.splice(targetIndex, 0, moved);
+    setSelectedExercises(copy);
   };
 
-  // GUARDAR TODO
-const handleSave = async () => {
-    if (!routineName) return alert("Ponle nombre a la rutina");
-    if (selectedExercises.length === 0) return alert("Agrega al menos un ejercicio");
+  const handleUpdateRow = (index: number, field: 'sets' | 'reps', value: string) => {
+    setSelectedExercises((prev) =>
+      prev.map((item, idx) =>
+        idx === index
+          ? { ...item, [field]: field === 'sets' ? Number(value) || 1 : value }
+          : item
+      )
+    );
+  };
+
+  const handleSave = async () => {
+    if (!routineName.trim()) return alert('Ponle un nombre a la rutina');
+    if (selectedExercises.length === 0) return alert('Agrega al menos un ejercicio a la rutina');
 
     setLoading(true);
     try {
-      let currentRoutineId;
+      let currentRoutineId: number;
 
       if (routineToEdit) {
-        // --- MODO EDICIÓN ---
-        // 1. Actualizar nombre
-        await updateRoutine(routineToEdit.id, routineName);
+        await updateRoutine(routineToEdit.id, routineName.trim());
         currentRoutineId = routineToEdit.id;
-        // 2. Borrar todos los ejercicios viejos para meter los nuevos (forma más segura de editar listas)
         await clearRoutineExercises(currentRoutineId);
       } else {
-        // --- MODO CREACIÓN ---
-        const newRoutine = await createRoutine(routineName);
+        const newRoutine = await createRoutine(routineName.trim());
         currentRoutineId = newRoutine.id;
       }
 
-      // --- GUARDAR EJERCICIOS (Para ambos modos) ---
       for (let i = 0; i < selectedExercises.length; i++) {
         const item = selectedExercises[i];
         if (item.exercise_id) {
-          await addExerciseToRoutine(currentRoutineId, item.exercise_id, i, item.sets, item.reps);
+          await addExerciseToRoutine(
+            currentRoutineId,
+            item.exercise_id,
+            i,
+            Number(item.sets) || 3,
+            item.reps || '10'
+          );
         }
       }
 
       onSuccess();
       onClose();
-    } catch (e) { alert('Error guardando'); }
-    finally { setLoading(false); }
+    } catch (e) {
+      alert('Error guardando la rutina');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
 
-  const filteredLibrary = library.filter(e => e.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredLibrary = library.filter((e) =>
+    e.name.toLowerCase().includes(search.toLowerCase())
+  );
+  const exactMatchExists = library.some(
+    (e) => e.name.toLowerCase() === search.trim().toLowerCase()
+  );
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" style={{height:'90vh', flexDirection:'column', padding:'0'}}>
-        
+    <div className="task-modal-overlay" onClick={onClose}>
+      <div
+        className="routine-builder-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* HEADER */}
-        <div style={{padding:'1rem', borderBottom:'1px solid var(--color-border)', display:'flex', justifyContent:'space-between'}}>
-          <input 
-            className="form-input" 
-            placeholder="Nombre de Rutina (ej: Pierna A)" 
-            value={routineName} onChange={e => setRoutineName(e.target.value)}
-            style={{fontSize:'1.2rem', fontWeight:700, border:'none', background:'transparent', padding:'0'}}
+        <header className="builder-modal-header">
+          <input
+            className="builder-title-input"
+            placeholder="Nombre de la rutina (ej: Empuje / Pierna A)..."
+            value={routineName}
+            onChange={(e) => setRoutineName(e.target.value)}
+            autoFocus
           />
-          <div style={{display:'flex', gap:'10px'}}>
-             <button onClick={handleSave} className="nav-btn" style={{backgroundColor:'var(--color-primary)'}}>
-               {loading ? '...' : <><Save size={18}/> Guardar</>}
-             </button>
-             <button onClick={onClose}><X size={24} color="var(--color-text-muted)"/></button>
-          </div>
-        </div>
 
-        <div style={{display:'flex', flex:1, overflow:'hidden'}}>
-          
-          {/* COLUMNA IZQ: LISTA DE RUTINA */}
-          <div style={{flex:1, padding:'1rem', overflowY:'auto', backgroundColor:'var(--color-bg)'}}>
-            {selectedExercises.length === 0 ? (
-              <p style={{textAlign:'center', color:'var(--color-text-muted)', marginTop:'50px'}}>
-                Tu rutina está vacía. <br/> Agrega ejercicios desde la derecha.
-              </p>
-            ) : (
-              selectedExercises.map((item, index) => (
-                <div key={index} className="routine-exercise-row">
-                  <div style={{display:'flex', alignItems:'center', gap:'10px', flex:1}}>
-                    <span style={{color:'var(--color-text-muted)', fontSize:'0.8rem'}}>#{index+1}</span>
-                    <span style={{fontWeight:600}}>{item.exercise?.name}</span>
-                  </div>
-                  
-                  <div className="row-inputs">
-                    <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-                       <label style={{fontSize:'0.6rem'}}>Sets</label>
-                       <input 
-                         className="small-input" type="number" style={{color:'var(--color-text-main)'}}
-                         value={item.sets} onChange={e => handleUpdateRow(index, 'sets', e.target.value)}
-                       />
-                    </div>
-                    <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-                       <label style={{fontSize:'0.6rem'}}>Reps</label>
-                       <input 
-                         className="small-input" type="text" style={{color:'var(--color-text-main)'}}
-                         value={item.reps} onChange={e => handleUpdateRow(index, 'reps', e.target.value)}
-                       />
-                    </div>
-                    <button onClick={() => handleRemove(index)} style={{color:'var(--color-danger)'}}><Trash2 size={18}/></button>
-                  </div>
-                </div>
-              ))
-            )}
-            
-            {/* BOTÓN AGREGAR (Móvil o Desktop) */}
-            <button 
-              onClick={() => setShowPicker(true)}
-              style={{
-                width:'100%', padding:'15px', border:'2px dashed var(--color-secondary)',
-                borderRadius:'var(--radius-md)', color:'var(--color-primary)', fontWeight:600,
-                marginTop:'20px', cursor:'pointer', background:'transparent'
-              }}
+          <div className="builder-header-actions">
+            <button type="button" className="task-btn-cancel" onClick={onClose}>
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="task-btn-save"
+              disabled={loading || !routineName.trim()}
+              onClick={handleSave}
             >
-              + Agregar Ejercicio
+              <Save size={16} />
+              <span>{loading ? 'Guardando...' : 'Guardar Rutina'}</span>
             </button>
           </div>
+        </header>
 
-          {/* COLUMNA DER (O MODAL EN MÓVIL): SELECTOR */}
-          {showPicker && (
-            <div style={{
-              width:'300px', borderLeft:'1px solid var(--color-border)', 
-              display:'flex', flexDirection:'column', backgroundColor:'var(--color-white)',
-              position: window.innerWidth < 768 ? 'fixed' : 'relative', // Fullscreen en móvil
-              top:0, bottom:0, right:0, left: window.innerWidth < 768 ? 0 : 'auto',
-              zIndex: 2100
-            }}>
-              <div style={{padding:'10px', borderBottom:'1px solid var(--color-border)', display:'flex', gap:'5px'}}>
-                <Search size={18} color="var(--color-text-muted)"/>
-                <input 
-                  autoFocus
-                  placeholder="Buscar ejercicio..." 
-                  value={search} onChange={e => setSearch(e.target.value)}
-                  style={{border:'none', outline:'none', width:'100%', background:'transparent', color:'var(--color-text-main)'}}
-                />
-                <button onClick={() => setShowPicker(false)}><X size={18}/></button>
+        {/* BODY DIVIDIDO: EJERCICIOS DE LA RUTINA (IZQ) + CATÁLOGO SIEMPRE VISIBLE EN PC (DER) */}
+        <div className="builder-split-body">
+          {/* COLUMNA IZQUIERDA: EJERCICIOS SELECCIONADOS */}
+          <div className="builder-selected-pane">
+            <div className="builder-pane-title">
+              <span>Ejercicios en la rutina ({selectedExercises.length})</span>
+              <button
+                type="button"
+                className="mobile-open-catalog-btn"
+                onClick={() => setShowMobilePicker(true)}
+              >
+                <Plus size={15} /> Agregar ejercicio
+              </button>
+            </div>
+
+            {selectedExercises.length === 0 ? (
+              <div className="builder-empty-box">
+                <Dumbbell size={34} strokeWidth={1.5} />
+                <p>Elige ejercicios del catálogo para armar el orden de tu entrenamiento.</p>
+                <button
+                  type="button"
+                  className="mobile-open-catalog-btn primary"
+                  onClick={() => setShowMobilePicker(true)}
+                >
+                  <Plus size={16} /> Explorar catálogo
+                </button>
               </div>
-              
-              <div style={{flex:1, overflowY:'auto'}}>
-                {filteredLibrary.map(ex => (
-                  <div key={ex.id} className="exercise-picker-item" onClick={() => handleAddExercise(ex)}>
-                    <span>{ex.name}</span>
-                    <Plus size={16} color="var(--color-secondary)"/>
+            ) : (
+              <div className="builder-rows-list">
+                {selectedExercises.map((item, index) => (
+                  <div key={`${item.exercise_id}-${index}`} className="builder-ex-row">
+                    {/* Botones de orden arriba/abajo */}
+                    <div className="builder-order-btns">
+                      <button
+                        type="button"
+                        disabled={index === 0}
+                        onClick={() => handleMove(index, 'up')}
+                        title="Subir"
+                      >
+                        <ArrowUp size={13} />
+                      </button>
+                      <span>#{index + 1}</span>
+                      <button
+                        type="button"
+                        disabled={index === selectedExercises.length - 1}
+                        onClick={() => handleMove(index, 'down')}
+                        title="Bajar"
+                      >
+                        <ArrowDown size={13} />
+                      </button>
+                    </div>
+
+                    <div className="builder-ex-name">
+                      <strong>{item.exercise?.name}</strong>
+                      {item.exercise?.last_weight ? (
+                        <span>Último peso: {item.exercise.last_weight} kg</span>
+                      ) : null}
+                    </div>
+
+                    <div className="builder-ex-inputs">
+                      <div className="mini-field">
+                        <label>Series</label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={item.sets}
+                          onChange={(e) => handleUpdateRow(index, 'sets', e.target.value)}
+                        />
+                      </div>
+
+                      <div className="mini-field">
+                        <label>Reps</label>
+                        <input
+                          type="text"
+                          value={item.reps}
+                          onChange={(e) => handleUpdateRow(index, 'reps', e.target.value)}
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        className="habit-icon-action danger"
+                        onClick={() => handleRemove(index)}
+                        title="Quitar de la rutina"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
+          {/* COLUMNA DERECHA: CATÁLOGO DE EJERCICIOS */}
+          <aside className={`builder-catalog-pane ${showMobilePicker ? 'mobile-open' : ''}`}>
+            <div className="catalog-search-bar">
+              <Search size={16} color="var(--color-text-muted)" />
+              <input
+                type="text"
+                placeholder="Buscar o crear ejercicio..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {showMobilePicker && (
+                <button type="button" onClick={() => setShowMobilePicker(false)}>
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+
+            <div className="catalog-items-scroll">
+              {search.trim() && !exactMatchExists && (
+                <button
+                  type="button"
+                  className="catalog-quick-create-btn"
+                  onClick={handleQuickCreateExercise}
+                  disabled={creatingQuickEx}
+                >
+                  <Sparkles size={15} />
+                  <span>
+                    Crear y agregar: <strong>"{search.trim()}"</strong>
+                  </span>
+                </button>
+              )}
+
+              {filteredLibrary.map((ex) => (
+                <button
+                  key={ex.id}
+                  type="button"
+                  className="catalog-ex-item"
+                  onClick={() => handleAddExercise(ex)}
+                >
+                  <div className="catalog-ex-text">
+                    <span>{ex.name}</span>
+                    {ex.last_weight > 0 && <small>{ex.last_weight} kg</small>}
+                  </div>
+                  <Plus size={16} color="var(--color-primary)" />
+                </button>
+              ))}
+            </div>
+          </aside>
         </div>
       </div>
     </div>

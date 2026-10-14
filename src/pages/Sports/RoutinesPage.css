@@ -1,90 +1,438 @@
-.routines-container {
-  padding: 1.5rem;
-  background-color: var(--color-bg);
-  min-height: 100vh;
-  color: var(--color-text-main);
-  max-width: 1000px;
+/* src/pages/Sports/RoutinesPage.css */
+
+.routines-page-wrapper {
+  max-width: 1020px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-/* TARJETA DE RUTINA */
-.routine-card {
+.routines-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.routine-card:hover {
-  border-color: var(--color-primary);
-  transform: translateY(-2px);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.4rem;
   box-shadow: var(--shadow-card);
 }
 
-.routine-info h3 {
-  margin: 0 0 5px 0;
+.routines-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.routines-header-left h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.routines-header-left p {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 2px 0 0 0;
+}
+
+.routines-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1rem;
+}
+
+.routine-modern-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease;
+}
+
+.routine-modern-card:hover {
+  border-color: var(--color-secondary);
+}
+
+.routine-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.routine-card-top h3 {
   font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 3px 0;
   color: var(--color-text-main);
 }
 
-.routine-meta {
-  font-size: 0.85rem;
+.routine-sub-count {
+  font-size: 0.76rem;
   color: var(--color-text-muted);
+}
+
+.routine-top-icons {
   display: flex;
-  gap: 15px;
+  gap: 4px;
 }
 
-/* --- CONSTRUCTOR (Builder) --- */
-.builder-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+.routine-preview-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  cursor: pointer;
 }
 
-/* Lista de ejercicios dentro de la rutina */
-.routine-exercise-row {
+.ex-preview-chip {
+  font-size: 0.74rem;
+  padding: 4px 9px;
+  border-radius: 6px;
   background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+}
+
+.ex-preview-chip strong {
+  color: var(--color-primary);
+  margin-left: 3px;
+}
+
+.ex-preview-chip.more,
+.empty-ex-chip {
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.routine-start-full-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(147, 129, 255, 0.15);
+  border: 1px solid rgba(147, 129, 255, 0.35);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.86rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.routine-start-full-btn:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.routines-empty-state {
+  background-color: var(--color-white);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   MODAL CONSTRUCTOR DE RUTINAS (SPLIT BUILDER)
+   ========================================================= */
+.routine-builder-modal {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 920px;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.builder-modal-header {
+  padding: 1rem 1.35rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.builder-title-input {
+  flex: 1;
+  min-width: 200px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+  outline: none;
+}
+
+.builder-title-input:focus {
+  border-bottom-color: var(--color-primary);
+}
+
+.builder-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.builder-split-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  overflow: hidden;
+}
+
+.builder-selected-pane {
+  padding: 1.15rem;
+  overflow-y: auto;
+  background-color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.builder-pane-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.mobile-open-catalog-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background-color: rgba(147, 129, 255, 0.16);
+  color: var(--color-primary);
+}
+
+.builder-rows-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.builder-ex-row {
+  background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 0.65rem 0.85rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
-.row-inputs {
+.builder-order-btns {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
   align-items: center;
+  gap: 1px;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
 }
 
-.small-input {
-  width: 60px;
+.builder-order-btns button {
+  color: var(--color-text-muted);
+  padding: 1px;
+}
+
+.builder-order-btns button:disabled {
+  opacity: 0.25;
+}
+
+.builder-ex-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.builder-ex-name strong {
+  font-size: 0.92rem;
+  color: var(--color-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.builder-ex-name span {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.builder-ex-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mini-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.mini-field label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.mini-field input {
+  width: 54px;
   padding: 5px;
-  border-radius: 4px;
+  border-radius: 6px;
   border: 1px solid var(--color-border);
-  background: var(--color-white);
+  background-color: var(--color-input-bg);
+  color: var(--color-text-main);
   text-align: center;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 0.86rem;
 }
 
-/* Selector de ejercicios (Modal o Panel) */
-.exercise-picker-item {
-  padding: 10px;
-  border-bottom: 1px solid var(--color-border);
-  cursor: pointer;
+/* Catálogo derecho */
+.builder-catalog-pane {
+  border-left: 1px solid var(--color-border);
+  background-color: var(--color-white);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  overflow: hidden;
 }
-.exercise-picker-item:hover {
+
+.catalog-search-bar {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   background-color: var(--color-input-bg);
+}
+
+.catalog-search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--color-text-main);
+  font-size: 0.88rem;
+}
+
+.catalog-items-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.catalog-ex-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  text-align: left;
+  color: var(--color-text-main);
+  transition: background-color 0.12s ease;
+}
+
+.catalog-ex-item:hover {
+  background-color: var(--color-input-bg);
+}
+
+.catalog-ex-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.catalog-ex-text span {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.catalog-ex-text small {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.catalog-quick-create-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background-color: rgba(147, 129, 255, 0.15);
+  border: 1px dashed var(--color-primary);
   color: var(--color-primary);
+  font-size: 0.84rem;
+  margin-bottom: 6px;
+}
+
+.builder-empty-box {
+  margin: auto;
+  text-align: center;
+  color: var(--color-text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .builder-split-body {
+    grid-template-columns: 1fr;
+    position: relative;
+  }
+
+  .mobile-open-catalog-btn {
+    display: inline-flex;
+  }
+
+  .builder-catalog-pane {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+  }
+
+  .builder-catalog-pane.mobile-open {
+    display: flex;
+  }
 }

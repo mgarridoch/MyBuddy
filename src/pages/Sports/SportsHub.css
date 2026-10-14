@@ -1,114 +1,424 @@
-.sports-hub-container {
-  padding: 1.5rem;
-  max-width: 800px; /* Ancho móvil */
-  width: 100%;
-  align-items: center; 
+/* src/pages/Sports/SportsHub.css */
+
+.sports-hub-wrapper {
+  max-width: 1020px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   color: var(--color-text-main);
-  justify-content: flex-start;
-  padding-top: 1rem;
-  
 }
 
-/* HERO SECTION */
-.hub-hero {
-  text-align: center;
-  margin-top: 1rem;
-}
-
-.start-workout-btn {
-  width: 100%;
-  height: 80px; /* Botón bien grande */
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+/* 1. BANNER DE SESIÓN EN VIVO */
+.active-workout-banner {
+  background: linear-gradient(135deg, rgba(147, 129, 255, 0.22), rgba(255, 159, 67, 0.16));
+  border: 1.5px solid var(--color-primary);
   border-radius: var(--radius-lg);
-  color: white;
-  font-size: 1.5rem;
-  font-weight: 800;
+  padding: 1.15rem 1.4rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
-  box-shadow: 0 10px 25px rgba(147, 129, 255, 0.4);
-  transition: transform 0.2s;
-  padding-left: 10%;
-  padding-right: 10%;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease;
 }
 
-.start-workout-btn:active {
-  transform: scale(0.98);
+.active-workout-banner:hover {
+  transform: translateY(-1px);
 }
 
-/* MENU GRID */
-.hub-menu-grid {
+.active-banner-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #ff9f43;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff9f43;
+  box-shadow: 0 0 8px #ff9f43;
+}
+
+.active-banner-left h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-text-main);
+}
+
+.active-banner-left p {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.active-banner-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.live-timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.resume-workout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 15px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+/* 2. TOP GRID (BIENVENIDA + ACCESOS) */
+.sports-top-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  width: 100%; /* Importante para que no se encoja */
-  max-width: 600px; /* Que no se estire demasiado */
+  grid-template-columns: 1.15fr 1fr;
+  gap: 1.15rem;
 }
 
-.hub-card {
+.sports-welcome-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+.sports-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+}
+
+.sports-welcome-card h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  margin: 4px 0 6px 0;
+  color: var(--color-text-main);
+}
+
+.sports-welcome-card p {
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.sports-kpi-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sport-kpi-pill {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.9rem;
+}
+
+.sport-kpi-pill div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.sport-kpi-pill strong {
+  font-size: 1.1rem;
+  color: var(--color-text-main);
+}
+
+.sport-kpi-pill span {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+/* Tarjetas de navegación laterales */
+.sports-nav-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.sport-module-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none; /* Para Link */
+  padding: 0.85rem 1.1rem;
+  text-decoration: none;
   color: var(--color-text-main);
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.hub-card:hover {
+.sport-module-card:hover {
   border-color: var(--color-primary);
   background-color: var(--color-input-bg);
 }
 
-.hub-icon-box {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: rgba(147, 129, 255, 0.1);
+.module-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: rgba(147, 129, 255, 0.14);
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary);
+  flex-shrink: 0;
 }
 
-/* MODAL SELECTOR */
-.selector-modal-content {
-  background-color: var(--color-white); /* Fondo correcto */
-  color: var(--color-text-main);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-border);
-  max-width: 800px;
-}
-
-.routine-selector-item {
-  padding: 15px 20px;
-  border-bottom: 1px solid var(--color-border); /* Borde sutil */
-  cursor: pointer;
+.module-card-text {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.module-card-text strong {
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.module-card-text span {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+}
+
+.module-arrow {
+  color: var(--color-text-muted);
+}
+
+/* 3. SECCIÓN DE RUTINAS DIRECTAS */
+.quick-routines-section,
+.recent-workouts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.section-header-bar {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.section-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-header-bar h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
   color: var(--color-text-main);
 }
 
-.routine-selector-item:hover {
-  background-color: var(--color-input-bg); /* Hover sutil */
+.manage-routines-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
   color: var(--color-primary);
+  text-decoration: none;
 }
 
-.routine-selector-item span {
+.quick-routines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+}
+
+.quick-routine-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease;
+}
+
+.quick-routine-card:hover {
+  border-color: var(--color-secondary);
+}
+
+.quick-routine-info {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.quick-routine-info h3 {
   font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: var(--color-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quick-routine-info span {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.start-routine-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: transform 0.12s ease, opacity 0.15s ease;
+}
+
+.start-routine-pill-btn:active {
+  transform: scale(0.95);
+}
+
+.routines-Empty-box {
+  background-color: var(--color-white);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.create-first-routine-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary);
+  color: #ffffff;
   font-weight: 600;
+  font-size: 0.86rem;
+}
+
+/* 4. ÚLTIMAS SESIONES */
+.recent-workouts-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-white);
+}
+
+.recent-workout-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.recent-workout-row:last-child {
+  border-bottom: none;
+}
+
+.recent-workout-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recent-workout-main strong {
+  font-size: 0.9rem;
+}
+
+.recent-workout-main span {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.workout-duration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text-muted);
+}
+
+/* RESPONSIVE MÓVIL */
+@media (max-width: 768px) {
+  .sports-top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .active-workout-banner {
+    padding: 1rem;
+  }
+
+  .active-banner-right {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
